@@ -21,6 +21,9 @@ void sync_oled_brightness_slave_handler(uint8_t in_buflen, const void* in_data, 
 
 void keyboard_post_init_user(void)
 {
+  idle_timer = timer_read32();
+  scan_disp_timer = timer_read32();
+  rgb_layers_init();
 #ifdef OLED_ENABLE
   oled_on();
   oled_set_brightness(oled_brightness);
@@ -31,9 +34,6 @@ void keyboard_post_init_user(void)
   }
   transaction_register_rpc(SYNC_OLED_BRIGHTNESS, sync_oled_brightness_slave_handler);
 #endif
-  idle_timer = timer_read32();
-  scan_disp_timer = timer_read32();
-  rgb_layers_init();
 }
 
 void matrix_scan_user(void)
@@ -104,21 +104,24 @@ void housekeeping_task_user(void)
     uint32_t elapsed_idle_secs = timer_elapsed32(idle_timer) / 1000;
     uint32_t elapsed_scan_ms = timer_elapsed32(scan_disp_timer);
 #ifdef OLED_ENABLE
-    if (elapsed_idle_secs != last_displayed_idle_secs) {
-      last_displayed_idle_secs = elapsed_idle_secs;
-      if (elapsed_idle_secs < OLED_TIMEOUT_SECS) {
-        oled_render_idle(OLED_TIMEOUT_SECS - elapsed_idle_secs);
-      } else {
-        // OLED timed out
-        if (is_oled_on()) oled_off();
-      }
-    }
-    oled_render_led_state();
-    if (elapsed_scan_ms > 1000) {
-        uint32_t scans_per_sec = (uint32_t)((float)scan_count/((float)elapsed_scan_ms/1000.0));
-        if (is_oled_on()) oled_render_scan_rate(scans_per_sec);
-        scan_count = 0;
-        scan_disp_timer = timer_read32();
+    if (elapsed_idle_secs < OLED_TIMEOUT_SECS && !is_oled_on()) oled_on();
+    if (is_oled_on()) {
+        if (elapsed_idle_secs != last_displayed_idle_secs) {
+            last_displayed_idle_secs = elapsed_idle_secs;
+            if (elapsed_idle_secs < OLED_TIMEOUT_SECS) {
+                oled_render_idle(OLED_TIMEOUT_SECS - elapsed_idle_secs);
+            } else {
+                // OLED timed out
+                oled_off();
+            }
+        }
+        oled_render_led_state();
+        if (elapsed_scan_ms > 1000) {
+            uint32_t scans_per_sec = (uint32_t)((float)scan_count/((float)elapsed_scan_ms/1000.0));
+            oled_render_scan_rate(scans_per_sec);
+            scan_count = 0;
+            scan_disp_timer = timer_read32();
+        }
     }
 #endif
     if (elapsed_idle_secs > RGB_TIMEOUT_SECS) {
