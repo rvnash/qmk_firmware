@@ -2,29 +2,17 @@
     "keyboard_name": "richkbd",
     "manufacturer": "rvnash",
     "url": "https://github.com/rvnash/richkbd",
-    "maintainer": "rvnash",
+    "maintainer": "rvnash@gmail.com",
     "debounce": 5,
     "diode_direction": "COL2ROW",
     "matrix_pins": {
         "rows": ["GP2", "GP3", "GP4", "GP19"],
-        "cols": ["GP10", "GP9", "GP8", "GP7", "GP6", "GP5", "GP25", "GP24", "GP23", "GP22", "GP21", "GP20"]
+        "cols": ["GP20", "GP21", "GP22", "GP23", "GP24", "GP25", "GP5", "GP6", "GP7", "GP8", "GP9", "GP10"]
     },
     "usb": {
         "vid": "0x2E8A",
         "pid": "0x1000",
         "device_version": "1.0.0"
-    },
-    "rgblight": {
-        "led_count": 42,
-        "pin": "GP14",
-        "hue_steps": 10,
-        "saturation_steps": 17,
-        "brightness_steps": 17,
-        "max_brightness": 200,
-        "sleep": true,
-        "animations": {
-            "all": true
-        }
     },
     "layouts": {
         "LAYOUT_richkbd": {
