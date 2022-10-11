@@ -14,46 +14,46 @@ LCTL(KC_LEFT),     LT(BUTTON, KC_Z),  KC_X,              KC_C,              KC_V
                                       LT(MEDIA, KC_ESC), LT(NAV, KC_SPC),   LT(MOUSE, KC_TAB), LT(SYM, KC_ENT),   LT(NUM, KC_BSPC),  LT(FUN, KC_DEL)
 
 #define NAV_LAYER \
-KC_NO,             QK_BOOTLOADER,     KC_NO,             KC_NO,             KC_NO,             KC_NO,              KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,           KC_NO,             \
+QK_BOOTLOADER,     KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,              KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,           KC_NO,             \
 KC_NO,             KC_LCTL,           KC_LALT,           KC_LGUI,           KC_LSFT,           KC_NO,              CAPS_WORD,         KC_LEFT,           KC_DOWN,           KC_UP,             KC_RGHT,         KC_NO,           \
 KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,              KC_INS,            KC_HOME,           KC_PGDN,           KC_PGUP,           KC_END,          KC_NO,            \
-                                      KC_NO,             KC_NO,             KC_NO,             KC_SPC,             KC_NO,             KC_NO
+                                                         KC_NO,             KC_NO,             KC_NO,              KC_NO,              KC_NO,             KC_NO
 
 #define MOUSE_LAYER \
-KC_NO,             QK_BOOTLOADER,     KC_NO,             KC_NO,             KC_NO,             KC_NO,              KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,           KC_NO,             \
+QK_BOOTLOADER,     KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,              KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,           KC_NO,             \
 KC_NO,             KC_LCTL,           KC_LALT,           KC_LGUI,           KC_LSFT,           KC_NO,              KC_NO,             KC_MS_L,           KC_MS_D,           KC_MS_U,           KC_MS_R,         KC_NO,           \
 KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,              KC_NO,             KC_WH_L,           KC_WH_D,           KC_WH_U,           KC_WH_R,         KC_NO,           \
-                                      KC_NO,             KC_NO,             KC_NO,             KC_BTN1,            KC_BTN3,           KC_BTN2
+                                                         KC_NO,             KC_NO,             KC_NO,             KC_BTN1,            KC_BTN3,           KC_BTN2
 
 #define MEDIA_LAYER \
-KC_NO,             QK_BOOTLOADER,     KC_NO,             KC_NO,             KC_NO,             KC_NO,              RGB_TOG,           RGB_MOD,           RGB_HUI,            RGB_SAI,           RGB_VAI,        KC_NO,           \
-KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_LSFT,           KC_NO,              OUT_AUTO,          KC_NO,             KC_NO,              OLED_BRIU,         KC_BRIU,        KC_NO,           \
+QK_BOOTLOADER,     KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,              RGB_TOG,           RGB_MOD,           RGB_HUI,            RGB_SAI,           RGB_VAI,        KC_NO,           \
+KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_LSFT,           KC_NO,              KC_NO,             KC_NO,             KC_NO,              OLED_BRIU,         KC_BRIU,        KC_NO,           \
 KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,              KC_NO,             KC_NO,             KC_NO,              KC_NO,             KC_BRID,        KC_NO,           \
-                                      KC_NO,             KC_NO,             KC_NO,             KC_MUTE,            KC_VOLD,           KC_VOLU
+                                                         KC_NO,             KC_NO,             KC_NO,             KC_MUTE,            KC_VOLD,           KC_VOLU
 
 #define NUM_LAYER \
-KC_NO,             KC_LBRC,           KC_7,              KC_8,              KC_9,              KC_RBRC,           KC_NO,              KC_NO,              KC_NO,              KC_NO,             QK_BOOTLOADER, KC_NO,             \
+KC_NO,             KC_LBRC,           KC_7,              KC_8,              KC_9,              KC_RBRC,           KC_NO,              KC_NO,              KC_NO,              KC_NO,             KC_NO,         KC_NO,             \
 KC_NO,             KC_SCLN,           KC_4,              KC_5,              KC_6,              KC_EQL,            KC_NO,              KC_LSFT,            KC_LGUI,            KC_LALT,           KC_LCTL,       KC_NO,           \
-KC_NO,             KC_GRV,            KC_1,              KC_2,              KC_3,              KC_BSLS,           KC_NO,              KC_NO,              KC_NO,              KC_ALGR,           KC_NO,         KC_NO,              \
-                                      KC_0,             KC_DOT,             KC_MINS,           KC_NO,             KC_NO,              KC_NO
+KC_NO,             KC_GRV,            KC_1,              KC_2,              KC_3,              KC_BSLS,           KC_NO,              KC_NO,              KC_NO,              KC_NO,             KC_NO,         KC_NO,              \
+                                                         KC_0,             KC_DOT,             KC_MINS,           KC_NO,              KC_NO,              KC_NO
 
 #define SYM_LAYER \
-KC_NO,             KC_LCBR,           KC_AMPR,           KC_ASTR,           KC_LPRN,           KC_RCBR,           KC_NO,              KC_NO,             KC_NO,             KC_NO,             QK_BOOTLOADER,   KC_NO,             \
+KC_NO,             KC_LCBR,           KC_AMPR,           KC_ASTR,           KC_LPRN,           KC_RCBR,           KC_NO,              KC_NO,             KC_NO,             KC_NO,             KC_NO,           KC_NO,             \
 KC_NO,             KC_COLN,           KC_DLR,            KC_PERC,           KC_CIRC,           KC_PLUS,           KC_NO,              KC_LSFT,           KC_LGUI,           KC_LALT,           KC_LCTL,         KC_NO,           \
-KC_NO,             KC_TILD,           KC_EXLM,           KC_AT,             KC_HASH,           KC_PIPE,           KC_NO,              KC_NO,             KC_NO,             KC_ALGR,           KC_NO,           KC_NO,              \
-                                      KC_LPRN,           KC_RPRN,           KC_UNDS,           KC_NO,              KC_NO,             KC_NO
+KC_NO,             KC_TILD,           KC_EXLM,           KC_AT,             KC_HASH,           KC_PIPE,           KC_NO,              KC_NO,             KC_NO,             KC_NO,             KC_NO,           KC_NO,              \
+                                                         KC_LPRN,           KC_RPRN,           KC_UNDS,           KC_NO,              KC_NO,             KC_NO
 
 #define FUN_LAYER \
 KC_NO,             KC_F12,            KC_F7,             KC_F8,             KC_F9,             KC_PSCR,           KC_NO,              KC_NO,             KC_NO,             KC_NO,             QK_BOOTLOADER,   KC_NO,             \
 KC_NO,             KC_F11,            KC_F4,             KC_F5,             KC_F6,             KC_SLCK,           KC_NO,              KC_LSFT,           KC_LGUI,           KC_LALT,           KC_LCTL,         KC_NO,           \
 KC_NO,             KC_F10,            KC_F1,             KC_F2,             KC_F3,             KC_PAUS,           KC_NO,              KC_NO,             KC_NO,             KC_ALGR,           KC_NO,           KC_NO,              \
-                                      KC_APP,            KC_SPC,            KC_TAB,            KC_NO,             KC_NO,              KC_NO
+                                                         KC_APP,            KC_SPC,            KC_TAB,            KC_NO,             KC_NO,              KC_NO
 
 #define BUTTON_LAYER \
 KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,            KC_NO,             \
 KC_NO,             KC_LCTL,           KC_LALT,           KC_LGUI,           KC_LSFT,           KC_NO,             KC_NO,             KC_LSFT,           KC_LGUI,           KC_LALT,           KC_LCTL,          KC_NO,           \
 KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,            KC_NO,             \
-                                      KC_BTN2,           KC_BTN3,           KC_BTN1,           KC_BTN1,           KC_BTN3,           KC_BTN2
+                                                         KC_BTN2,           KC_BTN3,           KC_BTN1,           KC_BTN1,           KC_BTN3,           KC_BTN2
 
 #define U_MACRO_VA_ARGS(macro, ...) macro(__VA_ARGS__)
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -66,101 +66,4 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [SYM]     = U_MACRO_VA_ARGS(LAYOUT_richkbd, SYM_LAYER),
   [FUN]     = U_MACRO_VA_ARGS(LAYOUT_richkbd, FUN_LAYER),
   [BUTTON]  = U_MACRO_VA_ARGS(LAYOUT_richkbd, BUTTON_LAYER)
-};
-
-led_config_t g_led_config = { {
-        // Key Matrix to LED Index
-        { 5,      6,      11,     12, 17, 18, 23, 24, 29, 30,     35,     36 },
-        { 4,      7,      10,     13, 16, 19, 22, 25, 28, 31,     34,     37 },
-        { 3,      8,      9 ,     14, 15, 20, 21, 26, 27, 32,     33,     38 },
-        { NO_LED, NO_LED, NO_LED, 2,  1,  0,  41, 40, 39, NO_LED, NO_LED, NO_LED }
-    }, {
-    // LED Index to Physical Position
-        {  102,  64 },
-        {  81,  64 },
-        { 61,  64 },
-        { 0,  43 },
-        { 0,  21 },
-        { 0,  0  },
-        { 20,  0  },
-        { 20,  21 },
-        { 20,  43 },
-        { 41,  43 },
-        { 41,  21 },
-        { 41,  0  },
-        { 61,  0  },
-        { 61,  21 },
-        { 61,  43 },
-        {  81,  43 },
-        {  81,  21 },
-        {  81,  0  },
-        {  102,  0  },
-        {  102,  21 },
-        {  102,  43 },
-        { 122,  43 },
-        { 122,  21 },
-        { 122,  0  },
-        { 143,  0  },
-        { 143,  21 },
-        { 143,  43 },
-        { 163,  43 },
-        { 163,  21 },
-        { 163,  0  },
-        { 183,  0  },
-        { 183,  21 },
-        { 183,  43 },
-        {  204,  43 },
-        {  204,  21 },
-        {  204,  0  },
-        {  224,  0  },
-        {  224,  21 },
-        {  224,  43 },
-        { 163,  64 },
-        { 143,  64 },
-        { 122,  64 }
-    }, {
-    // LED Index to Flag
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04,
-    0x04
-    }
 };
