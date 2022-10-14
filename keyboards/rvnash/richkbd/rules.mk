@@ -3,15 +3,11 @@ MCU = RP2040
 BOOTLOADER = rp2040
 BOARD = GENERIC_RP_RP2040
 
-# Build Options
+# Build Options - https://docs.qmk.fm/#/config_options?id=feature-options
 #   change yes to no to disable
 #
-BOOTMAGIC_ENABLE = yes      # Enable Bootmagic Lite
-EXTRAKEY_ENABLE = yes       # Audio control and System control
-CONSOLE_ENABLE = yes        # Console for debug
-COMMAND_ENABLE = no         # Commands for debug and configuration
-NKRO_ENABLE = no            # Enable N-Key Rollover
-LTO_ENABLE = no				# Link time optimization
+LTO_ENABLE = yes            # This link time optimization makes ~10% difference in code size, and takes ~25% more compile time
+NKRO_ENABLE = yes
 
 RGB_MATRIX_ENABLE = yes
 RGB_MATRIX_DRIVER = WS2812

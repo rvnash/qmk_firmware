@@ -116,7 +116,7 @@ void rgb_matrix_indicators_kb()
             range_color rc[] = {
                 {0,0, 11,3,    RGB_BLACK}, // Black out the whole keyboard
                 {7,1, 10,1,    RGB_GREEN}, // Mouse left, down, up, right
-                {7,1, 10,1,    RGB_BLUE}, // Wheel left, down, up, right
+                {7,2, 10,2,    RGB_BLUE}, // Wheel left, down, up, right
                 {6,3, 8,3,     RGB_CHARTREUSE}, // left, middle, right mouse button
                 {1,1, 4,1,     RGB_YELLOW}, // homerow mods active on the left
                 {0,0,  0,0,    RGB_RED},    // Bootloader
