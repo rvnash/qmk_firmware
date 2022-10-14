@@ -89,8 +89,16 @@
 #define ENABLE_RGB_MATRIX_SOLID_SPLASH        // Hue & value pulse away from a single key hit then fades value out
 #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH   // Hue & value pulse away from multiple key hits then fades value out
 
+// Need to keep this in sync with the selections above
+#define RGB_MATRIX_NAMES {"Solid", "Alphas Mods", "Gradient Vertical", "Gradient Horizontal", "Breathing", "Band Saturation", "Band Bright", "Pinwheel Saturation", "Pinwheel Bright", \
+                          "Spiral Saturation", "Spiral Bright", "Cycle All", "Cycle Horizontal", "Cycle Vertical", "Cycle In/Out", "Cycle Dual", "Rainbow Chevron", \
+                          "Cycle Pinwheel", "Cycle Spiral", "Dual Beacon", "Rainbow Beacon", "Rainbow Pinwheel", "Raindrops", "Jellybean", "Hue Breathing", \
+                          "Hue Pendulum", "Hue Wave", "Fractal", "Flow", "Rain", "Heatmap", "Digital Rain", "Reactive", "Reactive Pulses", "Reactive Wide", "Reactive Wide+", \
+                          "Reactive Cross", "Reactive Cross+", "Reactive Nexus", "Reactive Nexus+", "Splash", "Splash+", "Splash Solid", "Splash Solid+"}
+
 // OLED options
-#define OLED_TIMEOUT 600000
-#define OLED_SCREEN_SAVER_MS 15000
+#define OLED_TIMEOUT 0 // The driver's timeout doesn't play well with my screen saver and on/off button
+#define MY_OLED_TIMEOUT 600000
+#define OLED_SCREEN_SAVER_MS 3000
 #define OLED_BRIGHTNESS 128
 #define OLED_BRIGHTNESS_STEP 20

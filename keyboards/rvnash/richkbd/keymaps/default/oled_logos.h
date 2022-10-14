@@ -3,7 +3,9 @@
 typedef struct
 {
     uint8_t w, h;
+    bool flip;
     const uint8_t *img;
 } Image;
 
-extern const Image spurs_logo;
+extern int num_screen_saver_images;
+extern const Image screen_saver_images[];

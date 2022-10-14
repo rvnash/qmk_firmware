@@ -89,8 +89,9 @@ void rgb_matrix_indicators_kb()
         case MEDIA:
             {
             range_color rc[] = {
-                {6,0, 10,0,    RGB_ORANGE}, // LED Control keys
-                {9,1, 9,1,     RGB_ORANGE}, // OLED brightness key
+                {6,0, 11,0,    RGB_ORANGE}, // LED Control keys
+                {6,1, 7,1,     RGB_BLUE}, // OLED TOG and Logo
+                {9,1, 9,1,     RGB_BLUE}, // OLED brightness key
                 {4,1, 4,1,     RGB_YELLOW}, // Shift mod available
                 {6,3, 8,3,     RGB_RED},    // mute, vol-, vol+
                 {10,1, 10,2,   RGB_CHARTREUSE},    // Laptop display bright+, bright-

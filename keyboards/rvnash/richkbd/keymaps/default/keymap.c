@@ -27,7 +27,7 @@ void keyboard_post_init_user(void)
 {
     oled_post_init_user();
 }
-t
+
 void shutdown_user(void)
 {
     oled_shutdown_user();
@@ -35,10 +35,10 @@ void shutdown_user(void)
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record)
 {
-    oled_process_record_user(keycode, record);
-    return true;
+    return oled_process_record_user(keycode, record);
 }
 
 void housekeeping_task_user(void)
 {
+    oled_housekeeping();
 }

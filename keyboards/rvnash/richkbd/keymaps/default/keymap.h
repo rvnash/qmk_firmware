@@ -6,6 +6,8 @@ const char *layers_to_names[NUM_LAYERS];
 
 enum keyboard_keycodes {
     OLED_BRIU = SAFE_RANGE,
+    OLED_TOG,
+    OLED_LOGO,
     NEW_SAFE_RANGE  // Important!
 };
 
@@ -40,10 +42,10 @@ KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_N
                                                          KC_NO,             KC_NO,             KC_NO,             KC_BTN1,            KC_BTN3,           KC_BTN2
 
 #define MEDIA_LAYER \
-QK_BOOTLOADER,     KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,              RGB_TOG,           RGB_MOD,           RGB_HUI,            RGB_SAI,           RGB_VAI,        KC_NO, \
-KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_LSFT,           KC_NO,              KC_NO,             KC_NO,             KC_NO,              OLED_BRIU,         KC_BRIU,        KC_NO, \
+QK_BOOTLOADER,     KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,              RGB_TOG,           RGB_MOD,           RGB_HUI,            RGB_SAI,           RGB_VAI,        RGB_SPI, \
+KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_LSFT,           KC_NO,              OLED_TOG,          OLED_LOGO,         KC_NO,              OLED_BRIU,         KC_BRIU,        KC_NO, \
 KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,             KC_NO,              KC_NO,             KC_NO,             KC_NO,              KC_NO,             KC_BRID,        KC_NO, \
-                                                         KC_NO,             KC_NO,             KC_NO,             KC_MUTE,            KC_VOLD,           KC_VOLU
+                                                         KC_NO,             KC_NO,             KC_NO,              KC_MUTE,           KC_VOLD,           KC_VOLU
 
 #define NUM_LAYER \
 KC_NO,             KC_LBRC,           KC_7,              KC_8,              KC_9,              KC_RBRC,           KC_NO,              KC_NO,              KC_NO,              KC_NO,             KC_NO,         KC_NO, \

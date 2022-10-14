@@ -7,6 +7,8 @@
 
 static bool resetting = false;
 static bool screen_save = false;
+static bool oled_on_user = false;
+static int screen_saver_image = 0;
 static uint32_t idle_timer;
 oled_rotation_t oled_init_user(oled_rotation_t rotation)
 {
@@ -43,6 +45,7 @@ void oled_post_init_user(void)
 {
     wait_ms(300); // Not sure why I need this, but the oled will not start in the on state without it
     oled_on();
+    oled_on_user = true;
     idle_timer = timer_read32();
 }
 
@@ -65,17 +68,23 @@ void screen_saver(bool start)
     static int xpos = 0;
     static int ypos = 0;
     static int dir = 1;
+
     if (start) {
         logo_timer = timer_read();
         ypos = 64;
+    }
+    if (timer_elapsed(idle_timer) >= MY_OLED_TIMEOUT) {
+        // The idle time is from the last screen update, so we need to turn it off manually
+        oled_off();
+        return;
     }
     if (timer_elapsed(logo_timer) > 20) {
         logo_timer = timer_read();
         xpos += dir;
         if (xpos <= 0) dir = 1;
-        if (xpos >= 95 ) dir = -1;
+        if (xpos >= 128-screen_saver_images[screen_saver_image].w ) dir = -1;
         if (ypos > 0) ypos--;
-        oled_write_image(spurs_logo, xpos, ypos, false, (dir > 0), false);
+        oled_write_image(screen_saver_images[screen_saver_image], xpos, ypos, false, screen_saver_images[screen_saver_image].flip ? (dir > 0) : false, false);
     }
 }
 
@@ -121,9 +130,41 @@ void layer(bool force)
     }
 }
 
-#define SMOOTHING_FACT 0.0001
+void led_state(bool force)
+{
+    static int last_led_mode = -1;
+    static int last_h=0, last_s=0, last_v=0, last_oled_v = 0, last_speed = 0;
+    static char *led_state_names[] = RGB_MATRIX_NAMES;
+
+    int led_mode = rgb_matrix_is_enabled() ? rgb_matrix_get_mode() : -1;
+    int h = rgb_matrix_get_hue();
+    int s = rgb_matrix_get_sat();
+    int v = rgb_matrix_get_val();
+    int speed = rgb_matrix_get_speed();
+    int oled_v = oled_get_brightness();
+    if (force || led_mode != last_led_mode || h != last_h || s != last_s || v != last_v || oled_v != last_oled_v || speed != last_speed) {
+        char buf[22];
+        last_led_mode = led_mode;
+        last_h = h;
+        last_s = s;
+        last_v = v;
+        last_speed = speed;
+        last_oled_v = oled_v;
+        snprintf(buf, sizeof(buf), "LED: %-20s", led_mode > 0 ? led_state_names[led_mode-1] : "Off");
+        oled_set_cursor(0, 3);
+        oled_write(buf, false);
+        snprintf(buf, sizeof(buf), "HSVP: %3d,%3d,%3d:%3d", h, s, v, speed);
+        oled_set_cursor(0, 4);
+        oled_write(buf, false);
+        snprintf(buf, sizeof(buf), "Display Bright: %3d", oled_v);
+        oled_set_cursor(0, 5);
+        oled_write(buf, false);
+    }
+}
+
 void wpm(bool force)
 {
+#define SMOOTHING_FACT 0.0001
     static float smooth_wpm = 0.0;
     static int last_wpm = -1;
     smooth_wpm = SMOOTHING_FACT * get_current_wpm() + (1.0 - SMOOTHING_FACT) * smooth_wpm;
@@ -137,13 +178,26 @@ void wpm(bool force)
     }
 }
 
+void key(uint16_t keycode, keyrecord_t *record)
+{
+  char str[6];
+
+  int row = record->event.key.row;
+  int col = record->event.key.col;
+  snprintf(str, sizeof(str), "%1d x%2d", row, col);
+  oled_set_cursor(0, 6);
+  oled_write(str, false);
+}
+
 void screen_save_off(void)
 {
+    if (oled_on_user && !is_oled_on()) oled_on();
     screen_save = false;
     oled_clear();
     layer(true);
     mods(true);
     wpm(true);
+    led_state(true);
 }
 
 void screen_save_on(void)
@@ -153,11 +207,56 @@ void screen_save_on(void)
     screen_saver(true);
 }
 
-void oled_process_record_user(uint16_t keycode, keyrecord_t *record)
+bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
 {
   idle_timer = timer_read32();
   if (screen_save) {
     screen_save_off();
+  }
+  if (record->event.pressed && oled_on_user) {
+    key(keycode, record);
+  }
+  switch (keycode) {
+    case OLED_BRIU:
+      if (record->event.pressed) {
+        int brightness = oled_get_brightness();
+        if (get_mods() & MOD_MASK_SHIFT) {
+            brightness -= OLED_BRIGHTNESS_STEP;
+            if (brightness < 0) brightness = 0;
+        } else {
+            brightness += OLED_BRIGHTNESS_STEP;
+            if (brightness > 255) brightness = 255;
+        }
+        oled_set_brightness(brightness);
+      }
+      return false;
+    case OLED_TOG:
+      if (record->event.pressed) {
+        if (!is_oled_on()) {
+            oled_on();
+            uprint("on\n");
+            oled_on_user = true;
+        } else {
+            oled_off();
+            uprint("off\n");
+            oled_on_user = false;
+        }
+      }
+      return true;
+    case OLED_LOGO:
+      if (record->event.pressed) {
+        if (get_mods() & MOD_MASK_SHIFT) {
+            screen_saver_image -= 1;
+            if (screen_saver_image < 0) screen_saver_image = num_screen_saver_images-1;
+        } else {
+            screen_saver_image += 1;
+            if (screen_saver_image >= num_screen_saver_images) screen_saver_image = 0;
+        }
+
+      }
+      return false;
+    default:
+      return true; // Process all other keycodes normally
   }
 }
 
@@ -168,19 +267,28 @@ void check_screen_saver(void)
     }
 }
 
-bool oled_task_user(void)
+void oled_housekeeping(void)
 {
-    if (resetting ) return false; // no more info if we are rebooting
-
+    if (!oled_on_user) {
+       // if (is_oled_on()) oled_off(); // The OLED can keep trying to come on its own
+        return;
+    }
     if (screen_save) {
       screen_saver(false);
     } else {
       layer(false);
       mods(false);
       wpm(false);
+      led_state(false);
       check_screen_saver();
     }
-   return false;
+}
+
+bool oled_task_user(void)
+{
+    if (resetting ) return false; // no more info if we are rebooting
+    //oled_housekeeping();
+    return false;
 }
 
 
