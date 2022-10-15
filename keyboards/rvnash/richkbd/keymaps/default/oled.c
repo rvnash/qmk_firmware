@@ -1,7 +1,7 @@
 #include "oled.h"
 #include "oled_logos.h"
 #include "keymap.h"
-
+#include "persist.h"
 
 // Note, 128x64 OLED is 21 characters x 8 lines, with the last 2 lines being yellow.
 
@@ -9,6 +9,7 @@ static bool resetting = false;
 static bool screen_save = false;
 static bool oled_on_user = false;
 static int screen_saver_image = 0;
+static int running_screen_saver_image = 0;
 static uint32_t idle_timer;
 oled_rotation_t oled_init_user(oled_rotation_t rotation)
 {
@@ -44,8 +45,11 @@ void oled_write_image(Image image, uint8_t x_screen, uint8_t y_screen, bool tran
 void oled_post_init_user(void)
 {
     wait_ms(300); // Not sure why I need this, but the oled will not start in the on state without it
-    oled_on();
-    oled_on_user = true;
+    PersistedConfig pc = persist_read_state();
+    screen_saver_image = pc.screensaver_logo;
+    oled_on_user = pc.oled_on;
+    oled_on_user ? oled_on() : oled_off();
+    oled_set_brightness(pc.oled_brightness);
     idle_timer = timer_read32();
 }
 
@@ -55,7 +59,7 @@ void oled_shutdown_user(void)
     oled_clear();
     oled_set_cursor(0, 3);
     oled_write("Entering BOOTLOADER", false);
-    // Need to call oled_task() repeatedly to complete rendering. 100ms should be enough
+    // Need to call oled_task() repeatedly for a while to complete rendering before the system shutsdown
     uint16_t timer_start = timer_read();
     while (timer_elapsed(timer_start) < 200) {
         oled_task();
@@ -65,26 +69,35 @@ void oled_shutdown_user(void)
 void screen_saver(bool start)
 {
     static uint16_t logo_timer = 0;
+#define SWITCH_IMAGE_INTERVAL 30000
+    static uint16_t random_timer = 0;
     static int xpos = 0;
     static int ypos = 0;
     static int dir = 1;
 
     if (start) {
         logo_timer = timer_read();
+        random_timer = timer_read();
         ypos = 64;
     }
-    if (timer_elapsed(idle_timer) >= MY_OLED_TIMEOUT) {
+    if (!is_oled_on() || timer_elapsed(idle_timer) >= MY_OLED_TIMEOUT) {
         // The idle time is from the last screen update, so we need to turn it off manually
         oled_off();
         return;
+    }
+    if (screen_saver_image < 0 && timer_elapsed(random_timer) >= SWITCH_IMAGE_INTERVAL) {
+        random_timer = timer_read();
+        running_screen_saver_image = random() % num_screen_saver_images;
+        oled_clear();
     }
     if (timer_elapsed(logo_timer) > 20) {
         logo_timer = timer_read();
         xpos += dir;
         if (xpos <= 0) dir = 1;
-        if (xpos >= 128-screen_saver_images[screen_saver_image].w ) dir = -1;
+        if (xpos >= 128-screen_saver_images[running_screen_saver_image].w ) dir = -1;
         if (ypos > 0) ypos--;
-        oled_write_image(screen_saver_images[screen_saver_image], xpos, ypos, false, screen_saver_images[screen_saver_image].flip ? (dir > 0) : false, false);
+        oled_write_image(screen_saver_images[running_screen_saver_image], xpos, ypos,
+                         false, screen_saver_images[running_screen_saver_image].flip ? (dir > 0) : false, false);
     }
 }
 
@@ -189,20 +202,31 @@ void key(uint16_t keycode, keyrecord_t *record)
   oled_write(str, false);
 }
 
+void display_data(bool force)
+{
+    layer(force);
+    mods(force);
+    wpm(force);
+    led_state(force);
+}
+
 void screen_save_off(void)
 {
     if (oled_on_user && !is_oled_on()) oled_on();
     screen_save = false;
     oled_clear();
-    layer(true);
-    mods(true);
-    wpm(true);
-    led_state(true);
+    display_data(true);
 }
 
 void screen_save_on(void)
 {
     screen_save = true;
+    if (screen_saver_image < 0) {
+        srand(timer_read32());
+        running_screen_saver_image = random() % num_screen_saver_images;
+    } else {
+        running_screen_saver_image = screen_saver_image;
+    }
     oled_clear();
     screen_saver(true);
 }
@@ -228,31 +252,41 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
             if (brightness > 255) brightness = 255;
         }
         oled_set_brightness(brightness);
+        persist_update_oled_brightness(brightness);
       }
       return false;
     case OLED_TOG:
       if (record->event.pressed) {
-        if (!is_oled_on()) {
+        if (!oled_on_user) {
             oled_on();
-            uprint("on\n");
             oled_on_user = true;
         } else {
             oled_off();
-            uprint("off\n");
             oled_on_user = false;
         }
+        persist_update_oled_on(oled_on_user);
       }
       return true;
     case OLED_LOGO:
       if (record->event.pressed) {
         if (get_mods() & MOD_MASK_SHIFT) {
             screen_saver_image -= 1;
-            if (screen_saver_image < 0) screen_saver_image = num_screen_saver_images-1;
+            if (screen_saver_image < -1) screen_saver_image = num_screen_saver_images-1;
         } else {
             screen_saver_image += 1;
-            if (screen_saver_image >= num_screen_saver_images) screen_saver_image = 0;
+            if (screen_saver_image >= num_screen_saver_images) screen_saver_image = -1;
         }
-
+        persist_update_screensaver_logo(screen_saver_image);
+        oled_clear();
+        if (screen_saver_image < 0) {
+            oled_set_cursor(7, 3);
+            oled_write("Random", false);
+        } else {
+            oled_write_image(screen_saver_images[screen_saver_image], (128-screen_saver_images[screen_saver_image].w)/2, 0, false, false, false);
+        }
+      } else {
+        oled_clear();
+        display_data(true);
       }
       return false;
     default:
@@ -269,26 +303,13 @@ void check_screen_saver(void)
 
 void oled_housekeeping(void)
 {
-    if (!oled_on_user) {
-       // if (is_oled_on()) oled_off(); // The OLED can keep trying to come on its own
+    if (resetting || !oled_on_user || !is_oled_on()) {
         return;
     }
     if (screen_save) {
       screen_saver(false);
     } else {
-      layer(false);
-      mods(false);
-      wpm(false);
-      led_state(false);
+      display_data(false);
       check_screen_saver();
     }
 }
-
-bool oled_task_user(void)
-{
-    if (resetting ) return false; // no more info if we are rebooting
-    //oled_housekeeping();
-    return false;
-}
-
-

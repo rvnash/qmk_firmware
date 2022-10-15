@@ -1,5 +1,6 @@
 #include "keymap.h"
 #include "oled.h"
+#include "persist.h"
 
 #define U_MACRO_VA_ARGS(macro, ...) macro(__VA_ARGS__)
 // Define the layres
@@ -26,6 +27,8 @@ const char *layers_to_names[] = {"Miryoku/Colemak", "Miryoku/QWERTY","Navigation
 void keyboard_post_init_user(void)
 {
     oled_post_init_user();
+    // PersistedConfig pc =
+    persist_read_state();
 }
 
 void shutdown_user(void)

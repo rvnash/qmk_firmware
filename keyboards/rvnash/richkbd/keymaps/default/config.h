@@ -99,6 +99,6 @@
 // OLED options
 #define OLED_TIMEOUT 0 // The driver's timeout doesn't play well with my screen saver and on/off button
 #define MY_OLED_TIMEOUT 600000
-#define OLED_SCREEN_SAVER_MS 3000
+#define OLED_SCREEN_SAVER_MS 30000
 #define OLED_BRIGHTNESS 128
 #define OLED_BRIGHTNESS_STEP 20
