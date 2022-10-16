@@ -27,13 +27,21 @@ const char *layers_to_names[] = {"Miryoku/Colemak", "Miryoku/QWERTY","Navigation
 void keyboard_post_init_user(void)
 {
     oled_post_init_user();
-    // PersistedConfig pc =
-    persist_read_state();
 }
 
 void shutdown_user(void)
 {
     oled_shutdown_user();
+}
+
+layer_state_t layer_state_set_user(layer_state_t state)
+{
+  int layer = get_highest_layer(state);
+  if (layer == COLEMAK || layer == QWERTY || layer == STD_COLEMAK || layer == STD_QWERTY) {
+    uprintf("saving layer %d\n", layer);
+    set_single_persistent_default_layer(layer);
+  }
+  return state;
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record)

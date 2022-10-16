@@ -3,7 +3,6 @@
 void eeconfig_init_user(void) {  // EEPROM is getting reset!
     PersistedConfig pc;
     pc.raw = 0;
-    pc.keyboard_mode = 0;
     pc.oled_brightness = OLED_BRIGHTNESS;
     pc.screensaver_logo = 0;
     pc.oled_on = true;
@@ -15,8 +14,7 @@ PersistedConfig persist_read_state(void)
 {
     PersistedConfig pc;
     pc.raw = eeconfig_read_user();
-    uprintf("Read EEPROM state Mode: %d, Oled brightness: %d, logo: %d, oled on: %s\n",
-            pc.keyboard_mode,
+    uprintf("Read EEPROM state Oled brightness: %d, logo: %d, oled on: %s\n",
             pc.oled_brightness,
             pc.screensaver_logo,
             pc.oled_on ? "ON" : "OFF");
@@ -25,19 +23,11 @@ PersistedConfig persist_read_state(void)
 
 void persist_update_state(PersistedConfig pc)
 {
-    uprintf("Update EEPROM state Mode: %d, Oled brightness: %d, logo: %d, oled on: %s\n",
-            pc.keyboard_mode,
+    uprintf("Update EEPROM state Oled brightness: %d, logo: %d, oled on: %s\n",
             pc.oled_brightness,
             pc.screensaver_logo,
             pc.oled_on ? "ON" : "OFF");
     eeconfig_update_user(pc.raw);
-}
-
-void persist_update_keyboard_mode(uint8_t keyboard_mode)
-{
-    PersistedConfig pc = persist_read_state();
-    pc.keyboard_mode = keyboard_mode;
-    persist_update_state(pc);
 }
 
 void persist_update_oled_brightness(uint8_t oled_brightness)

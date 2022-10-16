@@ -48,9 +48,19 @@ void oled_post_init_user(void)
     PersistedConfig pc = persist_read_state();
     screen_saver_image = pc.screensaver_logo;
     oled_on_user = pc.oled_on;
+    uprintf("ON/OFF 1\n");
     oled_on_user ? oled_on() : oled_off();
     oled_set_brightness(pc.oled_brightness);
     idle_timer = timer_read32();
+}
+
+void oled_flush(void)
+{
+    // Need to call oled_task() repeatedly for a while to complete rendering
+    uint16_t timer_start = timer_read();
+    while (timer_elapsed(timer_start) < 200) {
+        oled_task();
+    }
 }
 
 void oled_shutdown_user(void)
@@ -59,11 +69,7 @@ void oled_shutdown_user(void)
     oled_clear();
     oled_set_cursor(0, 3);
     oled_write("Entering BOOTLOADER", false);
-    // Need to call oled_task() repeatedly for a while to complete rendering before the system shutsdown
-    uint16_t timer_start = timer_read();
-    while (timer_elapsed(timer_start) < 200) {
-        oled_task();
-    }
+    oled_flush();
 }
 
 void screen_saver(bool start)
@@ -82,6 +88,8 @@ void screen_saver(bool start)
     }
     if (!is_oled_on() || timer_elapsed(idle_timer) >= MY_OLED_TIMEOUT) {
         // The idle time is from the last screen update, so we need to turn it off manually
+    uprintf("OFF 2\n");
+        oled_flush();
         oled_off();
         return;
     }
@@ -212,7 +220,10 @@ void display_data(bool force)
 
 void screen_save_off(void)
 {
-    if (oled_on_user && !is_oled_on()) oled_on();
+    if (oled_on_user && !is_oled_on()) {
+    uprintf("ON 3\n");
+        oled_on();
+    }
     screen_save = false;
     oled_clear();
     display_data(true);
@@ -258,15 +269,18 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
     case OLED_TOG:
       if (record->event.pressed) {
         if (!oled_on_user) {
-            oled_on();
+    uprintf("ON 4\n");
             oled_on_user = true;
+            oled_on();
         } else {
-            oled_off();
+    uprintf("OFF 5\n");
             oled_on_user = false;
+            oled_flush();
+            oled_off();
         }
         persist_update_oled_on(oled_on_user);
       }
-      return true;
+      return false;
     case OLED_LOGO:
       if (record->event.pressed) {
         if (get_mods() & MOD_MASK_SHIFT) {
