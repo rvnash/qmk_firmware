@@ -8,6 +8,7 @@
 static bool resetting = false;
 static bool screen_save = false;
 static bool oled_on_user = false;
+static bool showing_image = false;
 static int screen_saver_image = 0;
 static int running_screen_saver_image = 0;
 static uint32_t idle_timer;
@@ -116,17 +117,17 @@ void mods(bool force)
     if (force || last_mods != mods) {
         last_mods = mods;
         int highest_layer = get_highest_layer(layer_state|default_layer_state);
-        oled_set_cursor(0, 1);
-        oled_write("Mods: ", false);
+uprintf("mods\n");
+        oled_set_cursor(6, 6);
         if (highest_layer < STD_QWERTY) {
-            oled_write("C", (mods & MOD_BIT(KC_LCTL)));
-            oled_write("A", (mods & MOD_BIT(KC_LALT)));
-            oled_write("@", (mods & MOD_BIT(KC_LCMD)));
-            oled_write("S", (mods & MOD_BIT(KC_LSFT)));
-            oled_write("S", (mods & MOD_BIT(KC_RSFT)));
-            oled_write("@", (mods & MOD_BIT(KC_RGUI)));
-            oled_write("A", (mods & MOD_BIT(KC_RALT)));
-            oled_write("C", (mods & MOD_BIT(KC_RCTL)));
+            oled_write((mods & MOD_BIT(KC_LCTL)) ? "C" : " ", (mods & MOD_BIT(KC_LCTL)) );
+            oled_write((mods & MOD_BIT(KC_LALT)) ? "A" : " ", (mods & MOD_BIT(KC_LALT)) );
+            oled_write((mods & MOD_BIT(KC_LCMD)) ? "@" : " ", (mods & MOD_BIT(KC_LCMD)) );
+            oled_write((mods & MOD_BIT(KC_LSFT)) ? "S" : " ", (mods & MOD_BIT(KC_LSFT)) );
+            oled_write((mods & MOD_BIT(KC_RSFT)) ? "S" : " ", (mods & MOD_BIT(KC_RSFT)) );
+            oled_write((mods & MOD_BIT(KC_RGUI)) ? "@" : " ", (mods & MOD_BIT(KC_RGUI)) );
+            oled_write((mods & MOD_BIT(KC_RALT)) ? "A" : " ", (mods & MOD_BIT(KC_RALT)) );
+            oled_write((mods & MOD_BIT(KC_RCTL)) ? "C" : " ", (mods & MOD_BIT(KC_RCTL)) );
         } else {
             oled_write("C", (mods & MOD_BIT(KC_LCTL)));
             oled_write("S", (mods & MOD_BIT(KC_LSFT)));
@@ -142,6 +143,7 @@ void layer(bool force)
     static int last_layer = -1;
     int highest_layer = get_highest_layer(layer_state|default_layer_state);
     if (force || highest_layer != last_layer) {
+uprintf("layer\n");
         char buf[22];
         last_layer = highest_layer;
         snprintf(buf, sizeof(buf), "Mode: %-20s", layers_to_names[highest_layer]);
@@ -164,6 +166,7 @@ void led_state(bool force)
     int speed = rgb_matrix_get_speed();
     int oled_v = oled_get_brightness();
     if (force || led_mode != last_led_mode || h != last_h || s != last_s || v != last_v || oled_v != last_oled_v || speed != last_speed) {
+uprintf("state\n");
         char buf[22];
         last_led_mode = led_mode;
         last_h = h;
@@ -171,14 +174,14 @@ void led_state(bool force)
         last_v = v;
         last_speed = speed;
         last_oled_v = oled_v;
-        snprintf(buf, sizeof(buf), "LED: %-20s", led_mode > 0 ? led_state_names[led_mode-1] : "Off");
-        oled_set_cursor(0, 3);
+        snprintf(buf, sizeof(buf), "LED : %-20s", led_mode > 0 ? led_state_names[led_mode-1] : "Off");
+        oled_set_cursor(0, 1);
         oled_write(buf, false);
         snprintf(buf, sizeof(buf), "HSVP: %3d,%3d,%3d:%3d", h, s, v, speed);
-        oled_set_cursor(0, 4);
+        oled_set_cursor(0, 2);
         oled_write(buf, false);
-        snprintf(buf, sizeof(buf), "Display Bright: %3d", oled_v);
-        oled_set_cursor(0, 5);
+        snprintf(buf, sizeof(buf), "OLED: %3d", oled_v);
+        oled_set_cursor(0, 4);
         oled_write(buf, false);
     }
 }
@@ -191,10 +194,11 @@ void wpm(bool force)
     smooth_wpm = SMOOTHING_FACT * get_current_wpm() + (1.0 - SMOOTHING_FACT) * smooth_wpm;
     int wpm = smooth_wpm;
     if (force || last_wpm != wpm) {
+uprintf("wbm\n");
         char buf[22];
         last_wpm = wpm;
-        oled_set_cursor(0, 2);
-        snprintf(buf, sizeof(buf), "WPM: %3d                   ", wpm);
+        oled_set_cursor(14, 6);
+        snprintf(buf, sizeof(buf), "%3d", wpm);
         oled_write(buf, false);
     }
 }
@@ -205,6 +209,7 @@ void key(uint16_t keycode, keyrecord_t *record)
 
   int row = record->event.key.row;
   int col = record->event.key.col;
+uprintf("key\n");
   snprintf(str, sizeof(str), "%1d x%2d", row, col);
   oled_set_cursor(0, 6);
   oled_write(str, false);
@@ -220,6 +225,7 @@ void display_data(bool force)
 
 void screen_save_off(void)
 {
+    uprintf("Screen Saver off\n");
     if (oled_on_user && !is_oled_on()) {
     uprintf("ON 3\n");
         oled_on();
@@ -231,6 +237,7 @@ void screen_save_off(void)
 
 void screen_save_on(void)
 {
+    uprintf("Screen Saver on\n");
     screen_save = true;
     if (screen_saver_image < 0) {
         srand(timer_read32());
@@ -240,6 +247,17 @@ void screen_save_on(void)
     }
     oled_clear();
     screen_saver(true);
+}
+
+void display_image(void)
+{
+    oled_clear();
+    if (screen_saver_image < 0) {
+        oled_set_cursor(7, 3);
+        oled_write("Random", false);
+    } else {
+        oled_write_image(screen_saver_images[screen_saver_image], (128-screen_saver_images[screen_saver_image].w)/2, 0, false, false, false);
+    }
 }
 
 bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
@@ -290,18 +308,20 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
             screen_saver_image += 1;
             if (screen_saver_image >= num_screen_saver_images) screen_saver_image = -1;
         }
+        display_image();
         persist_update_screensaver_logo(screen_saver_image);
-        oled_clear();
-        if (screen_saver_image < 0) {
-            oled_set_cursor(7, 3);
-            oled_write("Random", false);
-        } else {
-            oled_write_image(screen_saver_images[screen_saver_image], (128-screen_saver_images[screen_saver_image].w)/2, 0, false, false, false);
-        }
-      } else {
-        oled_clear();
-        display_data(true);
       }
+      return false;
+      case LT(MEDIA, KC_ESC):
+        if (record->event.pressed) {
+uprintf("Image\n");
+            showing_image = true;
+            display_image();
+        } else {
+            showing_image = false;
+            oled_clear();
+            display_data(true);
+        }
       return false;
     default:
       return true; // Process all other keycodes normally
@@ -310,6 +330,11 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
 
 void check_screen_saver(void)
 {
+    static uint32_t print_timer = 0;
+    if (timer_elapsed32(print_timer) > 1000) {
+        print_timer = timer_read32();
+        uprintf("Elabsed screen saver app %ld of %ld\n", timer_elapsed32(idle_timer), OLED_SCREEN_SAVER_MS);
+    }
     if (timer_elapsed32(idle_timer) > OLED_SCREEN_SAVER_MS) {
         screen_save_on();
     }
@@ -317,7 +342,7 @@ void check_screen_saver(void)
 
 void oled_housekeeping(void)
 {
-    if (resetting || !oled_on_user || !is_oled_on()) {
+    if (showing_image || resetting || !oled_on_user || !is_oled_on()) {
         return;
     }
     if (screen_save) {
