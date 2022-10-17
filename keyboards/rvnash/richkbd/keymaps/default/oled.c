@@ -3,18 +3,49 @@
 #include "keymap.h"
 #include "persist.h"
 
-// Note, 128x64 OLED is 21 characters x 8 lines, with the last 2 lines being yellow.
+static bool is_resetting = false;
+static bool is_oled_in_on_mode = false;
+static bool is_in_screen_timed_out_state = false;
 
-static bool resetting = false;
-static bool screen_save = false;
-static bool oled_on_user = false;
-static bool showing_image = false;
-static int screen_saver_image = 0;
-static int running_screen_saver_image = 0;
+static bool is_screen_saver_on = false;
+static int chosen_screen_saver_image = 0;
+static int active_screen_saver_image = 0;
+
 static uint32_t idle_timer;
+
 oled_rotation_t oled_init_user(oled_rotation_t rotation)
 {
   return OLED_ROTATION_180;
+}
+
+void oled_post_init_user(void)
+{
+    wait_ms(300); // Not sure why I need this, but the oled will not start in the on state without it
+    PersistedConfig pc = persist_read_state();
+    chosen_screen_saver_image = pc.screensaver_logo;
+    is_oled_in_on_mode = pc.oled_on;
+    is_oled_in_on_mode ? oled_on() : oled_off();
+    oled_set_brightness(pc.oled_brightness);
+    idle_timer = timer_read32();
+    is_in_screen_timed_out_state = false;
+}
+
+void oled_flush(void)
+{
+    // Need to call oled_task() repeatedly for a while to complete rendering
+    uint16_t timer_start = timer_read();
+    while (timer_elapsed(timer_start) < 200) {
+        oled_task();
+    }
+}
+
+void oled_shutdown_user(void)
+{
+    is_resetting = true;
+    oled_clear();
+    oled_set_cursor(0, 3);
+    oled_write("Entering BOOTLOADER", false);
+    oled_flush();
 }
 
 uint8_t getPix(const uint8_t *img, uint8_t x, uint8_t y, uint8_t w, uint8_t h)
@@ -43,37 +74,7 @@ void oled_write_image(Image image, uint8_t x_screen, uint8_t y_screen, bool tran
     }
 }
 
-void oled_post_init_user(void)
-{
-    wait_ms(300); // Not sure why I need this, but the oled will not start in the on state without it
-    PersistedConfig pc = persist_read_state();
-    screen_saver_image = pc.screensaver_logo;
-    oled_on_user = pc.oled_on;
-    uprintf("ON/OFF 1\n");
-    oled_on_user ? oled_on() : oled_off();
-    oled_set_brightness(pc.oled_brightness);
-    idle_timer = timer_read32();
-}
-
-void oled_flush(void)
-{
-    // Need to call oled_task() repeatedly for a while to complete rendering
-    uint16_t timer_start = timer_read();
-    while (timer_elapsed(timer_start) < 200) {
-        oled_task();
-    }
-}
-
-void oled_shutdown_user(void)
-{
-    resetting = true;
-    oled_clear();
-    oled_set_cursor(0, 3);
-    oled_write("Entering BOOTLOADER", false);
-    oled_flush();
-}
-
-void screen_saver(bool start)
+void render_screen_saver(bool start)
 {
     static uint16_t logo_timer = 0;
 #define SWITCH_IMAGE_INTERVAL 30000
@@ -87,37 +88,29 @@ void screen_saver(bool start)
         random_timer = timer_read();
         ypos = 64;
     }
-    if (!is_oled_on() || timer_elapsed(idle_timer) >= MY_OLED_TIMEOUT) {
-        // The idle time is from the last screen update, so we need to turn it off manually
-    uprintf("OFF 2\n");
-        oled_flush();
-        oled_off();
-        return;
-    }
-    if (screen_saver_image < 0 && timer_elapsed(random_timer) >= SWITCH_IMAGE_INTERVAL) {
+    if (chosen_screen_saver_image < 0 && timer_elapsed(random_timer) >= SWITCH_IMAGE_INTERVAL) {
         random_timer = timer_read();
-        running_screen_saver_image = random() % num_screen_saver_images;
+        active_screen_saver_image = random() % num_screen_saver_images;
         oled_clear();
     }
     if (timer_elapsed(logo_timer) > 20) {
         logo_timer = timer_read();
         xpos += dir;
         if (xpos <= 0) dir = 1;
-        if (xpos >= 128-screen_saver_images[running_screen_saver_image].w ) dir = -1;
+        if (xpos >= 128-screen_saver_images[active_screen_saver_image].w ) dir = -1;
         if (ypos > 0) ypos--;
-        oled_write_image(screen_saver_images[running_screen_saver_image], xpos, ypos,
-                         false, screen_saver_images[running_screen_saver_image].flip ? (dir > 0) : false, false);
+        oled_write_image(screen_saver_images[active_screen_saver_image], xpos, ypos,
+                         false, screen_saver_images[active_screen_saver_image].flip ? (dir > 0) : false, false);
     }
 }
 
-void mods(bool force)
+void render_mods(bool force)
 {
     static int last_mods = -1;
     int mods = get_mods();
     if (force || last_mods != mods) {
         last_mods = mods;
         int highest_layer = get_highest_layer(layer_state|default_layer_state);
-uprintf("mods\n");
         oled_set_cursor(6, 6);
         if (highest_layer < STD_QWERTY) {
             oled_write((mods & MOD_BIT(KC_LCTL)) ? "C" : " ", (mods & MOD_BIT(KC_LCTL)) );
@@ -129,31 +122,30 @@ uprintf("mods\n");
             oled_write((mods & MOD_BIT(KC_RALT)) ? "A" : " ", (mods & MOD_BIT(KC_RALT)) );
             oled_write((mods & MOD_BIT(KC_RCTL)) ? "C" : " ", (mods & MOD_BIT(KC_RCTL)) );
         } else {
-            oled_write("C", (mods & MOD_BIT(KC_LCTL)));
-            oled_write("S", (mods & MOD_BIT(KC_LSFT)));
-            oled_write("@", (mods & MOD_BIT(KC_LCMD)));
-            oled_write("A", (mods & MOD_BIT(KC_RALT)));
+            oled_write((mods & MOD_BIT(KC_LCTL)) ? "C" : " ", (mods & MOD_BIT(KC_LCTL)) );
+            oled_write((mods & MOD_BIT(KC_LSFT)) ? "S" : " ", (mods & MOD_BIT(KC_LSFT)) );
+            oled_write((mods & MOD_BIT(KC_LCMD)) ? "@" : " ", (mods & MOD_BIT(KC_LCMD)) );
+            oled_write((mods & MOD_BIT(KC_LALT)) ? "A" : " ", (mods & MOD_BIT(KC_LALT)) );
             oled_write("    ", false);
         }
     }
 }
 
-void layer(bool force)
+void render_layer(bool force)
 {
     static int last_layer = -1;
     int highest_layer = get_highest_layer(layer_state|default_layer_state);
     if (force || highest_layer != last_layer) {
-uprintf("layer\n");
         char buf[22];
         last_layer = highest_layer;
         snprintf(buf, sizeof(buf), "Mode: %-20s", layers_to_names[highest_layer]);
         oled_set_cursor(0, 0);
         oled_write(buf, false);
-        mods(true);
+        render_mods(true); // Changing the layer can effect the mods format.
     }
 }
 
-void led_state(bool force)
+void render_led_state(bool force)
 {
     static int last_led_mode = -1;
     static int last_h=0, last_s=0, last_v=0, last_oled_v = 0, last_speed = 0;
@@ -166,7 +158,6 @@ void led_state(bool force)
     int speed = rgb_matrix_get_speed();
     int oled_v = oled_get_brightness();
     if (force || led_mode != last_led_mode || h != last_h || s != last_s || v != last_v || oled_v != last_oled_v || speed != last_speed) {
-uprintf("state\n");
         char buf[22];
         last_led_mode = led_mode;
         last_h = h;
@@ -186,15 +177,11 @@ uprintf("state\n");
     }
 }
 
-void wpm(bool force)
+void render_wpm(bool force)
 {
-#define SMOOTHING_FACT 0.0001
-    static float smooth_wpm = 0.0;
     static int last_wpm = -1;
-    smooth_wpm = SMOOTHING_FACT * get_current_wpm() + (1.0 - SMOOTHING_FACT) * smooth_wpm;
-    int wpm = smooth_wpm;
+    int wpm = get_current_wpm();
     if (force || last_wpm != wpm) {
-uprintf("wbm\n");
         char buf[22];
         last_wpm = wpm;
         oled_set_cursor(14, 6);
@@ -203,71 +190,79 @@ uprintf("wbm\n");
     }
 }
 
-void key(uint16_t keycode, keyrecord_t *record)
+void render_key(uint16_t keycode, keyrecord_t *record)
 {
   char str[6];
 
   int row = record->event.key.row;
   int col = record->event.key.col;
-uprintf("key\n");
   snprintf(str, sizeof(str), "%1d x%2d", row, col);
   oled_set_cursor(0, 6);
   oled_write(str, false);
 }
 
-void display_data(bool force)
+void render_all_data(bool force)
 {
-    layer(force);
-    mods(force);
-    wpm(force);
-    led_state(force);
+    render_layer(force);
+    render_mods(force);
+    render_wpm(force);
+    render_led_state(force);
 }
 
-void screen_save_off(void)
+void render_image(void)
+{
+    if (!is_in_screen_timed_out_state && is_oled_in_on_mode) {
+        oled_clear();
+        if (chosen_screen_saver_image < 0) {
+            oled_set_cursor(7, 3);
+            oled_write("Random", false);
+        } else {
+            oled_write_image(screen_saver_images[chosen_screen_saver_image], (128-screen_saver_images[chosen_screen_saver_image].w)/2, 0, false, false, false);
+        }
+    }
+}
+
+void turn_screen_saver_off(void)
 {
     uprintf("Screen Saver off\n");
-    if (oled_on_user && !is_oled_on()) {
-    uprintf("ON 3\n");
-        oled_on();
+    is_screen_saver_on = false;
+    if (is_oled_in_on_mode) {
+        oled_clear();
+        render_all_data(true);
     }
-    screen_save = false;
-    oled_clear();
-    display_data(true);
 }
 
-void screen_save_on(void)
+void turn_screen_saver_on(void)
 {
     uprintf("Screen Saver on\n");
-    screen_save = true;
-    if (screen_saver_image < 0) {
+    is_screen_saver_on = true;
+    if (chosen_screen_saver_image < 0) {
         srand(timer_read32());
-        running_screen_saver_image = random() % num_screen_saver_images;
+        active_screen_saver_image = random() % num_screen_saver_images;
     } else {
-        running_screen_saver_image = screen_saver_image;
+        active_screen_saver_image = chosen_screen_saver_image;
     }
-    oled_clear();
-    screen_saver(true);
-}
-
-void display_image(void)
-{
-    oled_clear();
-    if (screen_saver_image < 0) {
-        oled_set_cursor(7, 3);
-        oled_write("Random", false);
-    } else {
-        oled_write_image(screen_saver_images[screen_saver_image], (128-screen_saver_images[screen_saver_image].w)/2, 0, false, false, false);
+    if (!is_in_screen_timed_out_state && is_oled_in_on_mode) {
+        oled_clear();
+        render_screen_saver(true);
     }
 }
 
 bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
 {
   idle_timer = timer_read32();
-  if (screen_save) {
-    screen_save_off();
+  if (is_in_screen_timed_out_state) {
+    is_in_screen_timed_out_state = false;
+    if (is_oled_in_on_mode) {
+        uprintf("TURN ON LED\n");
+        oled_on();
+    }
   }
-  if (record->event.pressed && oled_on_user) {
-    key(keycode, record);
+  if (is_screen_saver_on) {
+    turn_screen_saver_off();
+  }
+  if (record->event.pressed && is_oled_in_on_mode) {
+    render_key(keycode, record);
   }
   switch (keycode) {
     case OLED_BRIU:
@@ -280,75 +275,77 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
             brightness += OLED_BRIGHTNESS_STEP;
             if (brightness > 255) brightness = 255;
         }
-        oled_set_brightness(brightness);
+        if (is_oled_in_on_mode) {
+            oled_set_brightness(brightness);
+        }
         persist_update_oled_brightness(brightness);
       }
       return false;
     case OLED_TOG:
       if (record->event.pressed) {
-        if (!oled_on_user) {
-    uprintf("ON 4\n");
-            oled_on_user = true;
+        if (!is_oled_in_on_mode) {
+            is_oled_in_on_mode = true;
             oled_on();
         } else {
-    uprintf("OFF 5\n");
-            oled_on_user = false;
+            is_oled_in_on_mode = false;
             oled_flush();
             oled_off();
         }
-        persist_update_oled_on(oled_on_user);
+        persist_update_oled_on(is_oled_in_on_mode);
       }
       return false;
     case OLED_LOGO:
       if (record->event.pressed) {
-        if (get_mods() & MOD_MASK_SHIFT) {
-            screen_saver_image -= 1;
-            if (screen_saver_image < -1) screen_saver_image = num_screen_saver_images-1;
-        } else {
-            screen_saver_image += 1;
-            if (screen_saver_image >= num_screen_saver_images) screen_saver_image = -1;
-        }
-        display_image();
-        persist_update_screensaver_logo(screen_saver_image);
+          if (get_mods() & MOD_MASK_SHIFT) {
+              chosen_screen_saver_image -= 1;
+              if (chosen_screen_saver_image < -1) chosen_screen_saver_image = num_screen_saver_images-1;
+          } else {
+             chosen_screen_saver_image += 1;
+             if (chosen_screen_saver_image >= num_screen_saver_images) chosen_screen_saver_image = -1;
+          }
+          render_image();
+          persist_update_screensaver_logo(chosen_screen_saver_image);
+      } else {
+          if (is_oled_in_on_mode) {
+              oled_clear();
+              render_all_data(true);
+          }
       }
-      return false;
-      case LT(MEDIA, KC_ESC):
-        if (record->event.pressed) {
-uprintf("Image\n");
-            showing_image = true;
-            display_image();
-        } else {
-            showing_image = false;
-            oled_clear();
-            display_data(true);
-        }
       return false;
     default:
       return true; // Process all other keycodes normally
   }
 }
 
+void check_oled_timeout(void)
+{
+    if (is_oled_in_on_mode && !is_in_screen_timed_out_state && timer_elapsed(idle_timer) >= MY_OLED_TIMEOUT) {
+        // The idle time is from the last screen update, so we need to turn it off manually
+uprintf("TIMEOUT Turn OLED OFF\n");
+        oled_flush();
+        oled_off();
+        is_in_screen_timed_out_state = true;
+        return;
+    }
+
+}
+
 void check_screen_saver(void)
 {
-    static uint32_t print_timer = 0;
-    if (timer_elapsed32(print_timer) > 1000) {
-        print_timer = timer_read32();
-        uprintf("Elabsed screen saver app %ld of %ld\n", timer_elapsed32(idle_timer), OLED_SCREEN_SAVER_MS);
-    }
     if (timer_elapsed32(idle_timer) > OLED_SCREEN_SAVER_MS) {
-        screen_save_on();
+        turn_screen_saver_on();
     }
 }
 
 void oled_housekeeping(void)
 {
-    if (showing_image || resetting || !oled_on_user || !is_oled_on()) {
-        return;
-    }
-    if (screen_save) {
-      screen_saver(false);
-    } else {
-      display_data(false);
-      check_screen_saver();
+    check_oled_timeout();
+    if (!is_resetting && is_oled_in_on_mode && !is_in_screen_timed_out_state) {
+        if (is_screen_saver_on) {
+            render_screen_saver(false);
+        } else {
+            render_all_data(false);
+            check_screen_saver();
+        }
     }
 }
