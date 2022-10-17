@@ -15,7 +15,9 @@ enum keyboard_keycodes {
 // Layers are defined in 'LAYOUT_richkbd' format.
 
 // ---------------------------------------------------------------------
-// LAYOUT for the miryoku style that Rich prefers
+// LAYOUT for the "miryoku" similar style that Rich prefers.
+// Except CTRL and GUI are swapped on the home row mods and alot
+// of the duplicate ways at getting at things are removed.
 // ---------------------------------------------------------------------
 #define COLEMAK_LAYER \
 KC_NO, KC_Q, KC_W, KC_F, KC_P, KC_B, KC_J, KC_L, KC_U, KC_Y, KC_QUOT, KC_NO, \
@@ -66,7 +68,7 @@ KC_NO, KC_F10, KC_F1, KC_F2, KC_F3, KC_PAUS, KC_NO, KC_NO, KC_NO, KC_ALGR, KC_NO
 KC_APP, KC_SPC, KC_TAB, KC_NO, KC_NO, KC_NO
 
 // ---------------------------------------------------------------------
-// LAYOUT for the style most like the crnkbd default
+// LAYOUT for the style most similar to the crnkbd default
 // ---------------------------------------------------------------------
 #define STD_COLEMAK_LAYER \
 KC_TAB, KC_Q, KC_W, KC_F, KC_P, KC_B, KC_J, KC_L, KC_U, KC_Y, KC_COLN, KC_BSPC, \
