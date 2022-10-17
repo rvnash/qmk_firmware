@@ -46,6 +46,49 @@ void rgb_matrix_indicators_kb()
     }
     int highest_layer = get_highest_layer(layer_state|default_layer_state);
     switch (highest_layer) {
+        case NAV:
+            {
+            range_color rc[] = {
+                {0,0, 11,3,    RGB_BLACK}, // Black out the whole keyboard
+                {0,0,  0,0,    RGB_RED},    // Bootloader
+                {1,0, 4,0,     RGB_AZURE}, // Mode switching
+                {6,1, 6,1,     RGB_WHITE}, // CAPS_WORD
+                {7,1, 10,1,    RGB_CYAN}, // left, down, right, up
+                {6,2, 6,2,     RGB_BLUE}, // ins
+                {7,2, 10,2,    RGB_BLUE}, // home, pg down, pg up, end
+                {1,1, 4,1,     RGB_YELLOW}, // homerow mods active on the left
+                {-1,-1, -1,-1, -1,-1,-1}
+                };
+            set_colors_by_ranges( rc );
+            }
+            break;
+        case MOUSE:
+            {
+            range_color rc[] = {
+                {0,0, 11,3,    RGB_BLACK}, // Black out the whole keyboard
+                {7,1, 10,1,    RGB_CYAN}, // Mouse left, down, up, right
+                {7,2, 10,2,    RGB_BLUE}, // Wheel left, down, up, right
+                {6,3, 8,3,     RGB_CHARTREUSE}, // left, middle, right mouse button
+                {1,1, 4,1,     RGB_YELLOW}, // homerow mods active on the left
+                {-1,-1, -1,-1, -1,-1,-1}
+                };
+            set_colors_by_ranges( rc );
+            }
+            break;
+        case MEDIA:
+            {
+            range_color rc[] = {
+                {6,0, 11,0,    RGB_ORANGE}, // LED Control keys
+                {6,1, 7,1,     RGB_BLUE}, // OLED TOG and Logo
+                {9,1, 9,1,     RGB_BLUE}, // OLED brightness key
+                {4,1, 4,1,     RGB_YELLOW}, // Shift mod available
+                {6,3, 8,3,     RGB_RED},    // mute, vol-, vol+
+                {10,1, 10,2,   RGB_CHARTREUSE},    // Laptop display bright+, bright-
+                {-1,-1, -1,-1, -1,-1,-1}
+                };
+            set_colors_by_ranges( rc );
+            }
+            break;
         case NUM:
             {
             range_color rc[] = {
@@ -61,41 +104,11 @@ void rgb_matrix_indicators_kb()
             set_colors_by_ranges( rc );
             }
             break;
-        case NAV:
-            {
-            range_color rc[] = {
-                {0,0, 11,3,    RGB_BLACK}, // Black out the whole keyboard
-                {6,1, 6,1,     RGB_WHITE}, // CAPS_WORD
-                {7,1, 10,1,    RGB_GREEN}, // left, down, right, up
-                {6,2, 6,2,     RGB_CYAN}, // INS
-                {7,2, 10,2,    RGB_BLUE}, // home, pg down, pg up, end
-                {1,1, 4,1,     RGB_YELLOW}, // homerow mods active on the left
-                {0,0,  0,0,    RGB_RED},    // Bootloader
-                {-1,-1, -1,-1, -1,-1,-1}
-                };
-            set_colors_by_ranges( rc );
-            }
-            break;
         case SYM:
             {
             range_color rc[] = {
                 {0,0, 11,3,    RGB_BLACK}, // Black out the whole keyboard
                 {1,0, 5,3,     RGB_BLUE}, // All of the keys on the left side are symbols´
-                {-1,-1, -1,-1, -1,-1,-1}
-                };
-            set_colors_by_ranges( rc );
-            }
-            break;
-        case MEDIA:
-            {
-            range_color rc[] = {
-                {6,0, 11,0,    RGB_ORANGE}, // LED Control keys
-                {6,1, 7,1,     RGB_BLUE}, // OLED TOG and Logo
-                {9,1, 9,1,     RGB_BLUE}, // OLED brightness key
-                {4,1, 4,1,     RGB_YELLOW}, // Shift mod available
-                {6,3, 8,3,     RGB_RED},    // mute, vol-, vol+
-                {10,1, 10,2,   RGB_CHARTREUSE},    // Laptop display bright+, bright-
-                {0,0,  0,0,    RGB_RED},    // Bootloader
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );
@@ -112,15 +125,42 @@ void rgb_matrix_indicators_kb()
             set_colors_by_ranges( rc );
             }
             break;
-        case MOUSE:
+        case STD_NUM:
             {
             range_color rc[] = {
-                {0,0, 11,3,    RGB_BLACK}, // Black out the whole keyboard
-                {7,1, 10,1,    RGB_GREEN}, // Mouse left, down, up, right
+                {1,0, 10,2,    RGB_BLACK}, // Black out unused keys
+                {11,1, 11,2,   RGB_BLACK}, // Black out unused keys
+                {1,0, 10,0,    RGB_GREEN}, // Number keys
+                {7,1, 10,1,    RGB_CYAN}, // left, down, right, up
+                {-1,-1, -1,-1, -1,-1,-1}
+                };
+            set_colors_by_ranges( rc );
+            }
+            break;
+        case STD_SYM:
+            {
+            range_color rc[] = {
+                {1,1, 5,2,    RGB_BLACK}, // Black out unused keys
+                {1,0, 10,0,   RGB_BLUE}, // Symbols top row
+                {6,1, 11,2,   RGB_BLUE}, // Rest of the symbols
                 {7,2, 10,2,    RGB_BLUE}, // Wheel left, down, up, right
-                {6,3, 8,3,     RGB_CHARTREUSE}, // left, middle, right mouse button
-                {1,1, 4,1,     RGB_YELLOW}, // homerow mods active on the left
+                {-1,-1, -1,-1, -1,-1,-1}
+                };
+            set_colors_by_ranges( rc );
+            }
+            break;
+        case STD_FUNCS:
+            {
+            range_color rc[] = {
+                {0,0, 11,2,    RGB_BLACK}, // Black out the whole keyboard
+                {0,2,  0,2,    RGB_YELLOW},    // Shift
                 {0,0,  0,0,    RGB_RED},    // Bootloader
+                {1,0, 4,0,     RGB_AZURE}, // Mode switching
+                {1,1, 5,2,     RGB_ORANGE}, // LED Control keys
+                {6,1, 7,1,     RGB_BLUE}, // OLED TOG and Logo
+                {9,1, 9,1,     RGB_BLUE}, // OLED brightness key
+                {6,2, 8,2,     RGB_RED},    // mute, vol-, vol+
+                {10,1, 10,2,   RGB_CHARTREUSE},    // Laptop display bright+, bright-
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );

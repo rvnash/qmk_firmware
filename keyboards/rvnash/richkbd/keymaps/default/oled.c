@@ -125,7 +125,7 @@ void render_mods(bool force)
             oled_write((mods & MOD_BIT(KC_LCTL)) ? "C" : " ", (mods & MOD_BIT(KC_LCTL)) );
             oled_write((mods & MOD_BIT(KC_LSFT)) ? "S" : " ", (mods & MOD_BIT(KC_LSFT)) );
             oled_write((mods & MOD_BIT(KC_LCMD)) ? "@" : " ", (mods & MOD_BIT(KC_LCMD)) );
-            oled_write((mods & MOD_BIT(KC_LALT)) ? "A" : " ", (mods & MOD_BIT(KC_LALT)) );
+            oled_write((mods & MOD_BIT(KC_RALT)) ? "A" : " ", (mods & MOD_BIT(KC_RALT)) );
             oled_write("    ", false);
         }
     }
@@ -319,7 +319,7 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
 
 void check_oled_timeout(void)
 {
-    if (is_oled_in_on_mode && !is_in_screen_timed_out_state && timer_elapsed(idle_timer) >= MY_OLED_TIMEOUT) {
+    if (is_oled_in_on_mode && !is_in_screen_timed_out_state && timer_elapsed32(idle_timer) >= MY_OLED_TIMEOUT) {
         // The idle time is from the last screen update, so we need to turn it off manually
 uprintf("TIMEOUT Turn OLED OFF\n");
         oled_flush();
