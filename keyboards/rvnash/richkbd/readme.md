@@ -24,7 +24,7 @@ There are two basic letter arrangement, Colemak and QWERTY. Beyond that, moving 
 
 This is a fairly standard way of laying out 42 keys.
 
-[Click here](miry.md) to see a visual representation of all of the layers.
+[Click here](std.md) to see a visual representation of all of the layers.
 
 ### Switching Modes
 
