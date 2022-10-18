@@ -65,3 +65,15 @@ Finally, as a fun little use of the display, there is screen saver mode that the
 ## Bootloader
 
 You can enter the bootloader by holding down the "BOOTSEL" button, them pressing and releasing the "RESET" button. Alternatively there are keys mapped to a bootloader reset, which are described later.
+
+## Building and Installing
+
+To build and install the software you will need to familiarize yourself with how to setup a QMK development environment. The documentation is excellent and you can find it all [here](https://docs.qmk.fm/#/).
+
+Once you get that working, you will need to clone [this repository and branch](https://github.com/rvnash/qmk_firmware/tree/rvnash_rp2040).
+
+You can compile and flash the default layout for this keyboard with this command.
+
+    qmk flash -kb rvnash/richkbd -km default
+
+Reach out with any questions, and good luck, and enjoy!
