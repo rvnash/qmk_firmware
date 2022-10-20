@@ -20,6 +20,10 @@ This is a fairly standard way of laying out 42 keys.
 
 [Click here](std.md) to see a visual representation of all of the layers in this mode.
 
+### Colemak variant
+
+Actually, the Colemak variant in this default keymap is the [Mod-DH variant](https://colemakmods.github.io/mod-dh/).
+
 ## Switching Modes
 
 There are two modes and two letter layouts, making four high level modes. They are "Miry/Colemak", "Miry/QWERTY", "Std/Colemak", and "Std/QWERTY". To switch between the modes uses the "Nav Layer" from the "Miry" modes, or the "Functions" layer from the "Std" modes. The mode buttons are the second through fourth keys on the top row. The mode is persisted through reboots.
