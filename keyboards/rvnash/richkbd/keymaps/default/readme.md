@@ -12,6 +12,8 @@ There are two basic letter arrangement, Colemak and QWERTY. Beyond that, moving 
 
 [Click here](miry.md) to see a visual representation of all of the layers in this mode.
 
+Note that the first and last columns don't have anything to do in this mode, ase the modifiers are all on the home-row. I put a couple of common Mac keyboard shortcuts to change the workspace, but there are essentially six unassigned keys to do what you like with.
+
 ### Standard Mode (crkbd Like)
 
 This is a fairly standard way of laying out 42 keys.
