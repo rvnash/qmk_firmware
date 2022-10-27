@@ -37,11 +37,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [STD_FUNCS]   = U_MACRO_VA_ARGS(LAYOUT_richkbd, STD_FUNCS_LAYER)
 };
 
-const char *layers_to_names[] = {"Miryoku/Colemak", "Miryoku/QWERTY",
-                                 "Std/QWERTY", "Std/Colemak", "Navigation",
-                                 "Miryoku/Mouse","Miryoku/Media","Miryoku/Numbers","Miryoku/Symbols","Miryoku/Function",
+const char *layers_to_names[] = {"Miry/Colemak", "Miry/QWERTY",
+                                 "Std/QWERTY", "Std/Colemak",
+                                 "Miry/Navigation","Miry/Mouse","Miry/Media","Miry/Numbers","Miry/Symbols","Miry/Function",
                                  "Std/Numbers","Std/Symbols","Std/Functions"};
-
 
 void keyboard_post_init_user(void)
 {

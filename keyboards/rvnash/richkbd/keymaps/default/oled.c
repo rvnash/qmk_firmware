@@ -18,10 +18,12 @@
 #include "oled_logos.h"
 #include "keymap.h"
 #include "persist.h"
+#include "asteroids/asteroids_main.h"
 
 static bool is_resetting = false;
 static bool is_oled_in_on_mode = false;
 static bool is_in_screen_timed_out_state = false;
+static bool is_running_astroids = false;
 
 static bool is_screen_saver_on = false;
 static int chosen_screen_saver_image = 0;
@@ -278,7 +280,9 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
     turn_screen_saver_off();
   }
   if (record->event.pressed && is_oled_in_on_mode) {
-    render_key(keycode, record);
+    if (!is_running_astroids) {
+        render_key(keycode, record);
+    }
   }
   switch (keycode) {
     case OLED_BRIU:
@@ -328,6 +332,21 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
           }
       }
       return false;
+    case ASTROIDS:
+      if (record->event.pressed) {
+        if (is_oled_in_on_mode) {
+            if (is_running_astroids) {
+                is_running_astroids = false;
+                oled_clear();
+                render_all_data(true);
+            } else {
+                is_running_astroids = true;
+                oled_clear();
+                asteroids_init();
+            }
+        }
+      }
+      return false;
     default:
       return true; // Process all other keycodes normally
   }
@@ -338,6 +357,7 @@ void check_oled_timeout(void)
     if (is_oled_in_on_mode && !is_in_screen_timed_out_state && timer_elapsed32(idle_timer) >= MY_OLED_TIMEOUT) {
         // The idle time is from the last screen update, so we need to turn it off manually
 uprintf("TIMEOUT Turn OLED OFF\n");
+        is_running_astroids = false;
         oled_flush();
         oled_off();
         is_in_screen_timed_out_state = true;
@@ -356,6 +376,10 @@ void check_screen_saver(void)
 void oled_housekeeping(void)
 {
     check_oled_timeout();
+    if (is_running_astroids) {
+        asteroids_pump();
+        return;
+    }
     if (!is_resetting && is_oled_in_on_mode && !is_in_screen_timed_out_state) {
         if (is_screen_saver_on) {
             render_screen_saver(false);
