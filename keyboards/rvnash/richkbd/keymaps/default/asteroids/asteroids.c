@@ -54,7 +54,7 @@ void init_asteroids(struct asteroid asteroids[], int size) {
 		}
 
 		asteroids[i].size = LARGE;
-		asteroids[i].hit_radius = 35;
+		asteroids[i].hit_radius = 20;
 		asteroids[i].rotation = degrees;
 		asteroids[i].location.x = lx;
 		asteroids[i].location.y = ly;
@@ -171,7 +171,7 @@ int shrink_asteroid(struct asteroid* a, int size) {
 
 	for (i = 0; i < VERTS; i++) {
 
-		multiply_vector(&a->obj_vert[i], 88);
+		multiply_vector(&a->obj_vert[i], 20);
 	}
 
 	if (size == LARGE) {

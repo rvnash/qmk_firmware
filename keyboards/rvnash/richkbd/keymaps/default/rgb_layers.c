@@ -97,6 +97,7 @@ void rgb_matrix_indicators_kb()
                 {6,0, 11,0,    RGB_ORANGE}, // LED Control keys
                 {6,1, 7,1,     RGB_BLUE}, // OLED TOG and Logo
                 {9,1, 9,1,     RGB_BLUE}, // OLED brightness key
+                {1,1, 1,1,     RGB_RED}, // Astroids game
                 {4,1, 4,1,     RGB_YELLOW}, // Shift mod available
                 {6,3, 8,3,     RGB_RED},    // mute, vol-, vol+
                 {10,1, 10,2,   RGB_CHARTREUSE},    // Laptop display bright+, bright-

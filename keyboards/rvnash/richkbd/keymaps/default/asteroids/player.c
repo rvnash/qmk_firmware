@@ -72,7 +72,6 @@ void draw_player(struct player* p) {
 	int i = 0;
 
 	if (p->lives > 0) {
-uprintf("drawing ship from %d %d to %d %d to %d %d\n", (int)p->world_vert[0].x, (int)p->world_vert[0].y, (int)p->world_vert[1].x, (int)p->world_vert[1].y, (int)p->world_vert[2].x, (int)p->world_vert[2].y);
 		draw_line(p->world_vert[0].x, p->world_vert[0].y, p->world_vert[1].x, p->world_vert[1].y, 1);
 		draw_line(p->world_vert[1].x, p->world_vert[1].y, p->world_vert[2].x, p->world_vert[2].y, 1);
 		draw_line(p->world_vert[2].x, p->world_vert[2].y, p->world_vert[0].x, p->world_vert[0].y, 1);

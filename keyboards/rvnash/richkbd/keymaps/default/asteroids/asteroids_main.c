@@ -33,11 +33,11 @@ void asteroids_init(void)
 		}
 
 		//convert screen space vector into world space
-		struct vector2d top_left = {20 + offset, 20};
+		struct vector2d top_left = {3 + offset, 5};
 		add_vector(&top_left, &translation);
 		lives[i].location = top_left;
 		update_player(&lives[i]);
-		offset += 20;
+		offset += 5;
 	}
 	//set up player and asteroids in world space
 	init_player(&p);
@@ -46,26 +46,46 @@ void asteroids_init(void)
     asteroid_timer = timer_read32();
 }
 
+bool key_left = false;
+bool key_right = false;
+bool key_up = false;
+bool key_fire = false;
+void asteroids_process_record_user(uint16_t keycode, keyrecord_t *record)
+{
+    if (record->event.key.col == 8 && record->event.key.row == 1) {
+        key_left = record->event.pressed;
+    }
+    if (record->event.key.col == 9 && record->event.key.row == 1) {
+        key_right = record->event.pressed;
+    }
+    if (record->event.key.col == 10 && record->event.key.row == 1) {
+        key_up = record->event.pressed;
+    }
+    if (record->event.key.col == 7 && record->event.key.row == 1) {
+        key_fire = record->event.pressed;
+    }
+}
+
 void asteroids_loop(void)
 {
-    if (false /* UP */) {
+    if (key_up) {
 
         struct vector2d thrust = get_direction(&p);
         multiply_vector(&thrust, .06);
         apply_force(&p.velocity, thrust);
     }
 
-    if (false /* LEFT */) {
+    if (key_left) {
 
-        rotate_player(&p, -4);
+        rotate_player(&p, -6);
     }
 
-    if (false /* RIGHT */) {
+    if (key_right) {
 
-        rotate_player(&p, 4);
+        rotate_player(&p, 6);
     }
 
-    if (false /* fire */) {
+    if (key_fire) {
         if (p.lives > 0) {
             shoot_bullet(&p);
         }
@@ -82,27 +102,27 @@ void asteroids_loop(void)
     bounds_player(&p);
     bounds_asteroids(asteroids, ASTEROIDS);
 
-    int res = collision_asteroids(asteroids, ASTEROIDS, &p.location, p.hit_radius);
+    // int res = collision_asteroids(asteroids, ASTEROIDS, &p.location, p.hit_radius);
 
-    if (res != -1) {
+    // if (res != -1) {
 
-        p.lives--;
-        p.location.x = 0;
-        p.location.y = 0;
-        p.velocity.x = 0;
-        p.velocity.y = 0;
+    //     p.lives--;
+    //     p.location.x = 0;
+    //     p.location.y = 0;
+    //     p.velocity.x = 0;
+    //     p.velocity.y = 0;
 
-        int i = LIVES - 1;
+    //     int i = LIVES - 1;
 
-        for ( i = LIVES; i >= 0; i--) {
+    //     for ( i = LIVES; i >= 0; i--) {
 
-            if(lives[i].lives > 0) {
+    //         if(lives[i].lives > 0) {
 
-                lives[i].lives = 0;
-                break;
-            }
-        }
-    }
+    //             lives[i].lives = 0;
+    //             break;
+    //         }
+    //     }
+    // }
 
     int i = 0;
     struct vector2d translation = {-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2};

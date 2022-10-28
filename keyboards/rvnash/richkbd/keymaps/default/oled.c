@@ -279,10 +279,18 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
   if (is_screen_saver_on) {
     turn_screen_saver_off();
   }
-  if (record->event.pressed && is_oled_in_on_mode) {
-    if (!is_running_astroids) {
-        render_key(keycode, record);
+  if (is_running_astroids) {
+    if (keycode == ASTROIDS && record->event.pressed) {
+        is_running_astroids = false;
+        oled_clear();
+        render_all_data(true);
+        return false;
     }
+    asteroids_process_record_user(keycode, record);
+    return false;
+  }
+  if (record->event.pressed && is_oled_in_on_mode) {
+    render_key(keycode, record);
   }
   switch (keycode) {
     case OLED_BRIU:
@@ -335,15 +343,9 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
     case ASTROIDS:
       if (record->event.pressed) {
         if (is_oled_in_on_mode) {
-            if (is_running_astroids) {
-                is_running_astroids = false;
-                oled_clear();
-                render_all_data(true);
-            } else {
-                is_running_astroids = true;
-                oled_clear();
-                asteroids_init();
-            }
+            is_running_astroids = true;
+            oled_clear();
+            asteroids_init();
         }
       }
       return false;
