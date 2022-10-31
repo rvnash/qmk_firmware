@@ -9,7 +9,7 @@ void init_player(struct player* p) {
 	int i = 0;
 	struct vector2d translation = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
 
-	p->hit_radius = 10;
+	p->hit_radius = 8;
 	p->lives = 3;
 	p->location.x = 0;
 	p->location.y = 0;
@@ -75,15 +75,18 @@ void draw_player(struct player* p) {
 		draw_line(p->world_vert[0].x, p->world_vert[0].y, p->world_vert[1].x, p->world_vert[1].y, 1);
 		draw_line(p->world_vert[1].x, p->world_vert[1].y, p->world_vert[2].x, p->world_vert[2].y, 1);
 		draw_line(p->world_vert[2].x, p->world_vert[2].y, p->world_vert[0].x, p->world_vert[0].y, 1);
-	}
 
-	/*
-	//draw vers representing the player
-	for (i = 0; i < P_VERTS; i++) {
+        float hr = p->hit_radius;
+        struct vector2d
+            loc = p->location,
+            translation = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
+        add_vector(&loc, &translation);
 
-		draw_pixel(pixel_buffer, p->world_vert[i].x, p->world_vert[i].y, 0xff00ffff);
+		draw_line(loc.x-hr, loc.y-hr, loc.x+hr, loc.y-hr, 1);
+		draw_line(loc.x+hr, loc.y-hr, loc.x+hr, loc.y+hr, 1);
+		draw_line(loc.x+hr, loc.y+hr, loc.x-hr, loc.y+hr, 1);
+		draw_line(loc.x-hr, loc.y+hr, loc.x-hr, loc.y-hr, 1);
 	}
-	*/
 
 	//draw verts representing the bullets
 	for (i = 0; i < BULLETS; i++) {
@@ -94,14 +97,6 @@ void draw_player(struct player* p) {
 		}
 	}
 
-	/*
-	//draw vert representing ships location
-	struct vector2d cpy = {p->location.x, p->location.y};
-	struct vector2d translation = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
-	add_vector(&cpy, &translation);
-
-	draw_pixel(pixel_buffer, cpy.x, cpy.y, 0x00ff00ff);
-	*/
 }
 
 void update_player(struct player* p) {

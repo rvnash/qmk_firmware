@@ -6,51 +6,49 @@
 #define ASTEROIDS 27
 #define LIVES 3
 
-struct asteroid asteroids[ASTEROIDS];		//The asteroids
-struct player p;				//The player
-struct player lives[LIVES];			//Player lives left
+struct asteroid asteroids[ASTEROIDS];   //The asteroids
+struct player p;                        //The player
+struct player lives[LIVES];             //Player lives left
 uint32_t next_loop;
 static uint32_t asteroid_timer;
 #define MS_PER_FRAME (1000/15)
+int loop_count = 0;
+static uint32_t loop_timer;
 
 void asteroids_init(void)
 {
-	int i = 0;
-	int j = 0;
-	int offset = 0;
-	struct vector2d translation = {-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2};
+    int i = 0;
+    int j = 0;
+    int offset = 0;
+    struct vector2d translation = {-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2};
 
-	//set up icons used to represent player lives
-	for (i = 0; i < LIVES; i++) {
-
-		init_player(&lives[i]);
-		lives[i].lives = 1;
-
-		//shrink lives
-		for (j = 0; j < P_VERTS; j++) {
-
-			divide_vector(&lives[i].obj_vert[j], 2);
-		}
-
-		//convert screen space vector into world space
-		struct vector2d top_left = {3 + offset, 5};
-		add_vector(&top_left, &translation);
-		lives[i].location = top_left;
-		update_player(&lives[i]);
-		offset += 5;
-	}
-	//set up player and asteroids in world space
-	init_player(&p);
-	init_asteroids(asteroids, ASTEROIDS);
+    //set up icons used to represent player lives
+    for (i = 0; i < LIVES; i++) {
+        init_player(&lives[i]);
+        lives[i].lives = 1;
+        //shrink lives
+        for (j = 0; j < P_VERTS; j++) {
+            divide_vector(&lives[i].obj_vert[j], 2);
+        }
+        //convert screen space vector into world space
+        struct vector2d top_left = {3 + offset, 5};
+        add_vector(&top_left, &translation);
+        lives[i].location = top_left;
+        update_player(&lives[i]);
+        offset += 5;
+    }
+    //set up player and asteroids in world space
+    init_player(&p);
+    init_asteroids(asteroids, ASTEROIDS);
     next_loop = MS_PER_FRAME;
     asteroid_timer = timer_read32();
+    loop_timer = timer_read32();
 }
 
 bool key_left = false;
 bool key_right = false;
 bool key_up = false;
-bool key_fire = false;
-void asteroids_process_record_user(uint16_t keycode, keyrecord_t *record)
+void asteroids_process_record_quantum(keyrecord_t *record)
 {
     if (record->event.key.col == 8 && record->event.key.row == 1) {
         key_left = record->event.pressed;
@@ -61,36 +59,32 @@ void asteroids_process_record_user(uint16_t keycode, keyrecord_t *record)
     if (record->event.key.col == 10 && record->event.key.row == 1) {
         key_up = record->event.pressed;
     }
-    if (record->event.key.col == 7 && record->event.key.row == 1) {
-        key_fire = record->event.pressed;
+    if (record->event.key.col == 7 && record->event.key.row == 1 && record->event.pressed && p.lives) {
+        shoot_bullet(&p);
     }
 }
 
 void asteroids_loop(void)
 {
+    if (timer_elapsed32(loop_timer) >= 1000) {
+        uprintf("astr loop cnt %d\n", loop_count);
+        loop_timer = timer_read32();
+        loop_count = 0;
+    }
+    loop_count++;
     if (key_up) {
-
         struct vector2d thrust = get_direction(&p);
         multiply_vector(&thrust, .06);
         apply_force(&p.velocity, thrust);
     }
 
     if (key_left) {
-
         rotate_player(&p, -7);
     }
 
     if (key_right) {
-
         rotate_player(&p, 7);
     }
-
-    if (key_fire) {
-        if (p.lives > 0) {
-            shoot_bullet(&p);
-        }
-    }
-
     // draw to the pixel buffer
     oled_clear();
     draw_player( &p);
@@ -105,19 +99,14 @@ void asteroids_loop(void)
     int res = collision_asteroids(asteroids, ASTEROIDS, &p.location, p.hit_radius);
 
     if (res != -1) {
-
         p.lives--;
         p.location.x = 0;
         p.location.y = 0;
         p.velocity.x = 0;
         p.velocity.y = 0;
-
         int i = LIVES - 1;
-
         for ( i = LIVES; i >= 0; i--) {
-
             if(lives[i].lives > 0) {
-
                 lives[i].lives = 0;
                 break;
             }

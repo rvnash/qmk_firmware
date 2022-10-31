@@ -18,12 +18,10 @@
 #include "oled_logos.h"
 #include "keymap.h"
 #include "persist.h"
-#include "asteroids/asteroids_main.h"
 
 static bool is_resetting = false;
 static bool is_oled_in_on_mode = false;
 static bool is_in_screen_timed_out_state = false;
-static bool is_running_astroids = false;
 
 static bool is_screen_saver_on = false;
 static int chosen_screen_saver_image = 0;
@@ -219,7 +217,7 @@ void render_key(uint16_t keycode, keyrecord_t *record)
   oled_write(str, false);
 }
 
-void render_all_data(bool force)
+void oled_render_all_data(bool force)
 {
     render_layer(force);
     render_mods(force);
@@ -246,7 +244,7 @@ void turn_screen_saver_off(void)
     is_screen_saver_on = false;
     if (is_oled_in_on_mode) {
         oled_clear();
-        render_all_data(true);
+        oled_render_all_data(true);
     }
 }
 
@@ -278,17 +276,6 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
   }
   if (is_screen_saver_on) {
     turn_screen_saver_off();
-  }
-  if (is_running_astroids) {
-    if (record->event.key.col == 1 && record->event.key.row == 1 && record->event.pressed) {
-        is_running_astroids = false;
-        oled_clear();
-        render_all_data(true);
-    } else {
-        asteroids_process_record_user(keycode, record);
-    }
-    // Doing ASTROIDS takes over the keyboard and no keys get through
-    return false;
   }
   if (record->event.pressed && is_oled_in_on_mode) {
     render_key(keycode, record);
@@ -337,18 +324,8 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
       } else {
           if (is_oled_in_on_mode) {
               oled_clear();
-              render_all_data(true);
+              oled_render_all_data(true);
           }
-      }
-      return false;
-    case ASTROIDS:
-      if (record->event.pressed) {
-        if (is_oled_in_on_mode) {
-            is_running_astroids = true;
-            oled_clear();
-            layer_clear();
-            asteroids_init();
-        }
       }
       return false;
     default:
@@ -361,7 +338,6 @@ void check_oled_timeout(void)
     if (is_oled_in_on_mode && !is_in_screen_timed_out_state && timer_elapsed32(idle_timer) >= MY_OLED_TIMEOUT) {
         // The idle time is from the last screen update, so we need to turn it off manually
 uprintf("TIMEOUT Turn OLED OFF\n");
-        is_running_astroids = false;
         oled_flush();
         oled_off();
         is_in_screen_timed_out_state = true;
@@ -380,21 +356,13 @@ void check_screen_saver(void)
 void oled_housekeeping(void)
 {
     check_oled_timeout();
-    if (is_running_astroids) {
-        asteroids_pump();
-        return;
-    }
     if (!is_resetting && is_oled_in_on_mode && !is_in_screen_timed_out_state) {
         if (is_screen_saver_on) {
             render_screen_saver(false);
         } else {
-            render_all_data(false);
+            oled_render_all_data(false);
             check_screen_saver();
         }
     }
 }
 
-bool is_oled_playing_asteroids(void)
-{
-    return is_running_astroids;
-}

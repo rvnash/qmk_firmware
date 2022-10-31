@@ -16,6 +16,7 @@
 
 #include "keymap.h"
 #include "oled.h"
+#include "asteroids/asteroids_main.h"
 #include "persist.h"
 
 #define U_MACRO_VA_ARGS(macro, ...) macro(__VA_ARGS__)
@@ -42,6 +43,12 @@ const char *layers_to_names[] = {"Miry/Colemak", "Miry/QWERTY",
                                  "Miry/Navigation","Miry/Mouse","Miry/Media","Miry/Numbers","Miry/Symbols","Miry/Function",
                                  "Std/Numbers","Std/Symbols","Std/Functions"};
 
+static bool is_running_astroids = false;
+bool is_oled_playing_asteroids(void)
+{
+    return is_running_astroids;
+}
+
 void keyboard_post_init_user(void)
 {
     oled_post_init_user();
@@ -54,41 +61,67 @@ void shutdown_user(void)
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record)
 {
+uprintf("process_record_user\n");
+    if (is_running_astroids) {
+        uprintf("process_record_quantum asteroids\n");
+        if (record->event.key.col == 1 && record->event.key.row == 1 && record->event.pressed) {
+            is_running_astroids = false;
+            oled_clear();
+            oled_render_all_data(true);
+         } else {
+            asteroids_process_record_quantum(record);
+         }
+         // Doing ASTROIDS takes over the keyboard and no keys get through
+         return false;
+    }
     if (!oled_process_record_user(keycode, record)) return false;
     switch (keycode) {
         case DF(QWERTY):
             if (record->event.pressed) {
-uprintf("saving layer %d\n", QWERTY);
+                uprintf("saving layer %d\n", QWERTY);
                 set_single_persistent_default_layer(QWERTY);
                 return false;
             }
             break;
         case DF(COLEMAK):
             if (record->event.pressed) {
-uprintf("saving layer %d\n", COLEMAK);
+                uprintf("saving layer %d\n", COLEMAK);
                 set_single_persistent_default_layer(COLEMAK);
                 return false;
             }
             break;
         case DF(STD_COLEMAK):
             if (record->event.pressed) {
-uprintf("saving layer %d\n", STD_COLEMAK);
+                uprintf("saving layer %d\n", STD_COLEMAK);
                 set_single_persistent_default_layer(STD_COLEMAK);
                 return false;
             }
             break;
         case DF(STD_QWERTY):
             if (record->event.pressed) {
-uprintf("saving layer %d\n", STD_QWERTY);
+                uprintf("saving layer %d\n", STD_QWERTY);
                 set_single_persistent_default_layer(STD_QWERTY);
                 return false;
             }
             break;
+        case ASTROIDS:
+        uprintf("ASTROIDS PRESSED\n");
+            if (record->event.pressed) {
+                is_running_astroids = true;
+                oled_clear();
+                layer_clear();
+                asteroids_init();
+                return false;
+            }
     }
     return true;
 }
 
 void housekeeping_task_user(void)
 {
-    oled_housekeeping();
+    if (is_running_astroids) {
+        asteroids_pump();
+    } else {
+        oled_housekeeping();
+    }
 }
