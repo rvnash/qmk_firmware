@@ -280,13 +280,14 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
     turn_screen_saver_off();
   }
   if (is_running_astroids) {
-    if (keycode == ASTROIDS && record->event.pressed) {
+    if (record->event.key.col == 1 && record->event.key.row == 1 && record->event.pressed) {
         is_running_astroids = false;
         oled_clear();
         render_all_data(true);
-        return false;
+    } else {
+        asteroids_process_record_user(keycode, record);
     }
-    asteroids_process_record_user(keycode, record);
+    // Doing ASTROIDS takes over the keyboard and no keys get through
     return false;
   }
   if (record->event.pressed && is_oled_in_on_mode) {
@@ -345,6 +346,7 @@ bool oled_process_record_user(uint16_t keycode, keyrecord_t *record)
         if (is_oled_in_on_mode) {
             is_running_astroids = true;
             oled_clear();
+            layer_clear();
             asteroids_init();
         }
       }
@@ -390,4 +392,9 @@ void oled_housekeeping(void)
             check_screen_saver();
         }
     }
+}
+
+bool is_oled_playing_asteroids(void)
+{
+    return is_running_astroids;
 }

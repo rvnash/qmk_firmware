@@ -11,7 +11,7 @@ struct player p;				//The player
 struct player lives[LIVES];			//Player lives left
 uint32_t next_loop;
 static uint32_t asteroid_timer;
-#define MS_PER_FRAME (1000/60)
+#define MS_PER_FRAME (1000/15)
 
 void asteroids_init(void)
 {
@@ -77,12 +77,12 @@ void asteroids_loop(void)
 
     if (key_left) {
 
-        rotate_player(&p, -6);
+        rotate_player(&p, -7);
     }
 
     if (key_right) {
 
-        rotate_player(&p, 6);
+        rotate_player(&p, 7);
     }
 
     if (key_fire) {
@@ -102,27 +102,27 @@ void asteroids_loop(void)
     bounds_player(&p);
     bounds_asteroids(asteroids, ASTEROIDS);
 
-    // int res = collision_asteroids(asteroids, ASTEROIDS, &p.location, p.hit_radius);
+    int res = collision_asteroids(asteroids, ASTEROIDS, &p.location, p.hit_radius);
 
-    // if (res != -1) {
+    if (res != -1) {
 
-    //     p.lives--;
-    //     p.location.x = 0;
-    //     p.location.y = 0;
-    //     p.velocity.x = 0;
-    //     p.velocity.y = 0;
+        p.lives--;
+        p.location.x = 0;
+        p.location.y = 0;
+        p.velocity.x = 0;
+        p.velocity.y = 0;
 
-    //     int i = LIVES - 1;
+        int i = LIVES - 1;
 
-    //     for ( i = LIVES; i >= 0; i--) {
+        for ( i = LIVES; i >= 0; i--) {
 
-    //         if(lives[i].lives > 0) {
+            if(lives[i].lives > 0) {
 
-    //             lives[i].lives = 0;
-    //             break;
-    //         }
-    //     }
-    // }
+                lives[i].lives = 0;
+                break;
+            }
+        }
+    }
 
     int i = 0;
     struct vector2d translation = {-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2};
@@ -160,7 +160,6 @@ void asteroids_pump(void)
     if (timer_elapsed32(asteroid_timer) > next_loop) {
         next_loop += MS_PER_FRAME;
         asteroids_loop();
-        oled_render();
     }
 }
 

@@ -9,7 +9,7 @@ void init_player(struct player* p) {
 	int i = 0;
 	struct vector2d translation = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
 
-	p->hit_radius = 15;
+	p->hit_radius = 10;
 	p->lives = 3;
 	p->location.x = 0;
 	p->location.y = 0;
@@ -108,19 +108,14 @@ void update_player(struct player* p) {
 
 	limit_vector(&p->velocity, 2);
 	add_vector(&p->location, &p->velocity);
-
 	struct vector2d translation = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
-
 	int i = 0;
-
 	for (i =0; i < P_VERTS; i++) {
-
 		p->world_vert[i] = add_vector_new(&p->obj_vert[i], &p->location);
 		add_vector(&p->world_vert[i], &translation);
 	}
 
 	for (i = 0; i < BULLETS; i++) {
-
 		add_vector(&p->bullets[i].location, &p->bullets[i].velocity);
 	}
 }

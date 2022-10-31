@@ -54,37 +54,36 @@ void shutdown_user(void)
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record)
 {
-    if (oled_process_record_user(keycode, record)) {
-        switch (keycode) {
-            case DF(QWERTY):
-                if (record->event.pressed) {
-    uprintf("saving layer %d\n", QWERTY);
-                    set_single_persistent_default_layer(QWERTY);
-                }
+    if (!oled_process_record_user(keycode, record)) return false;
+    switch (keycode) {
+        case DF(QWERTY):
+            if (record->event.pressed) {
+uprintf("saving layer %d\n", QWERTY);
+                set_single_persistent_default_layer(QWERTY);
                 return false;
-                break;
-            case DF(COLEMAK):
-                if (record->event.pressed) {
-    uprintf("saving layer %d\n", COLEMAK);
-                    set_single_persistent_default_layer(COLEMAK);
-                }
+            }
+            break;
+        case DF(COLEMAK):
+            if (record->event.pressed) {
+uprintf("saving layer %d\n", COLEMAK);
+                set_single_persistent_default_layer(COLEMAK);
                 return false;
-                break;
-            case DF(STD_COLEMAK):
-                if (record->event.pressed) {
-    uprintf("saving layer %d\n", STD_COLEMAK);
-                    set_single_persistent_default_layer(STD_COLEMAK);
-                }
+            }
+            break;
+        case DF(STD_COLEMAK):
+            if (record->event.pressed) {
+uprintf("saving layer %d\n", STD_COLEMAK);
+                set_single_persistent_default_layer(STD_COLEMAK);
                 return false;
-                break;
-            case DF(STD_QWERTY):
-                if (record->event.pressed) {
-    uprintf("saving layer %d\n", STD_QWERTY);
-                    set_single_persistent_default_layer(STD_QWERTY);
-                }
+            }
+            break;
+        case DF(STD_QWERTY):
+            if (record->event.pressed) {
+uprintf("saving layer %d\n", STD_QWERTY);
+                set_single_persistent_default_layer(STD_QWERTY);
                 return false;
-                break;
-        }
+            }
+            break;
     }
     return true;
 }

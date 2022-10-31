@@ -16,6 +16,7 @@
 
 #include "rgb_layers.h"
 #include "keymap.h"
+#include "oled.h"
 
 // Implement layers of color for the different modes
 
@@ -54,6 +55,17 @@ void rgb_matrix_indicators_kb()
                 {1,0, 9,0,    RGB_WHITE}, // Top row letters
                 {1,1, 10,1,    RGB_WHITE}, // Middle row letters
                 {1,2, 7,2,    RGB_WHITE}, // Bottom row letters
+                {-1,-1, -1,-1, -1,-1,-1}
+                };
+            set_colors_by_ranges( rc );
+
+        return;
+    }
+    if (is_oled_playing_asteroids()) {
+            range_color rc[] = {
+                {0,0, 11,3,    RGB_BLACK}, // Black out the whole keyboard
+                {7,1, 10,1,    RGB_WHITE}, // left, down, right, up
+                {1,1, 1,1,     RGB_RED}, // Astroids game
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );
@@ -149,6 +161,7 @@ void rgb_matrix_indicators_kb()
                 {11,1, 11,2,   RGB_BLACK}, // Black out unused keys
                 {1,0, 10,0,    RGB_GREEN}, // Number keys
                 {7,1, 10,1,    RGB_CYAN}, // left, down, right, up
+                {1,1, 1,1,     RGB_RED}, // Astroids game
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );
@@ -161,6 +174,7 @@ void rgb_matrix_indicators_kb()
                 {1,0, 10,0,   RGB_BLUE}, // Symbols top row
                 {6,1, 11,2,   RGB_BLUE}, // Rest of the symbols
                 {7,2, 10,2,    RGB_BLUE}, // Wheel left, down, up, right
+                {1,1, 1,1,     RGB_RED}, // Astroids game
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );
