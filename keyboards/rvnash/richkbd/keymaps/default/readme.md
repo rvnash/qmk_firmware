@@ -52,13 +52,21 @@ The OLED shows various pieces of status information about the keyboard.
 6. The current state of the modifiers: "C" for CTRL, "A" for ALT, "@" for GUI, "S' for SHIFT
 7. The current typing speed in words-per-minute
 
-Finally, as a fun little use of the display, there is screen saver mode that the OLED will enter after a little idle time. You can choose what image that you want to have bounce back and forth from a set in the default keymap code. The current set is listed here, but you can change or add your own up to the memory of the RP2040 Stamp flash size, which is substantial.
+# Screen Saver
+
+For a fun and practical use of the display, there is screen saver mode that the OLED will enter after a little idle time. You can choose what image that you want to have bounce back and forth from a set in the default keymap code. The current set is listed here, but you can change or add your own up to the memory of the RP2040 Stamp flash size, which is substantial.
 
 1. Tottenham Hotspur logo
 2. Steelers logo
 3. Penn State logo
 4. Reily - My daughter's Newfy
 5. Jade and Koda - My daughter's cats
+
+# Asteroids
+
+There is a playable crude asteroids game available at any time. When you activate it no keystrokes are sent to the host, you just play asteroids until you exit back to normal.
+
+![Asteroides](https://i.imgur.com/S0GkRUG.jpg)
 
 # Bootloader
 

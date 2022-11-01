@@ -64,7 +64,7 @@ void rgb_matrix_indicators_kb()
     if (is_oled_playing_asteroids()) {
             range_color rc[] = {
                 {0,0, 11,3,    RGB_BLACK}, // Black out the whole keyboard
-                {7,1, 10,1,    RGB_WHITE}, // left, down, right, up
+                {7,2, 10,2,    RGB_WHITE}, // left, down, right, up
                 {1,1, 1,1,     RGB_RED}, // Astroids game
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
