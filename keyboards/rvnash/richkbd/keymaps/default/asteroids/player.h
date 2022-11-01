@@ -8,20 +8,22 @@
 
 struct bullet {
 
-	struct vector2d location;
-	struct vector2d velocity;
-	bool alive;
+    struct vector2d location;
+    struct vector2d velocity;
+    bool alive;
 };
 
 struct player {
 
-	float hit_radius;
-	int lives;
-	struct vector2d location;
-	struct vector2d velocity;
-	struct vector2d obj_vert[P_VERTS];
-	struct vector2d world_vert[P_VERTS];
-	struct bullet bullets[BULLETS];
+    float hit_radius;
+    int lives;
+    bool alive;
+    int exploding_time;
+    struct vector2d location;
+    struct vector2d velocity;
+    struct vector2d obj_vert[P_VERTS];
+    struct vector2d world_vert[P_VERTS];
+    struct bullet bullets[BULLETS];
 };
 
 void init_player(struct player* p);

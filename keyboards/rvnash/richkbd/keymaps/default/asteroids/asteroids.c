@@ -7,6 +7,30 @@
 #include "renderer.h"
 #include "asteroids.h"
 
+void init_asteroids_verts(struct asteroid* a)
+{
+    a->obj_vert[0].x = .0;
+    a->obj_vert[0].y = .4;
+    a->obj_vert[1].x = .2;
+    a->obj_vert[1].y = .3;
+    a->obj_vert[2].x = .2;
+    a->obj_vert[2].y = .1;
+    a->obj_vert[3].x = .4;
+    a->obj_vert[3].y = .0;
+    a->obj_vert[4].x = .3;
+    a->obj_vert[4].y = -.2;
+    a->obj_vert[5].x = .1;
+    a->obj_vert[5].y = -.2;
+    a->obj_vert[6].x = .0;
+    a->obj_vert[6].y = -.3;
+    a->obj_vert[7].x = -.2;
+    a->obj_vert[7].y = -.2;
+    a->obj_vert[8].x = -.4;
+    a->obj_vert[8].y = 0;
+    a->obj_vert[9].x = -.3;
+    a->obj_vert[9].y = .3;
+}
+
 void init_asteroids(struct asteroid asteroids[], int size) {
 
     int i = 0;
@@ -60,29 +84,9 @@ void init_asteroids(struct asteroid asteroids[], int size) {
         asteroids[i].location.y = ly;
         asteroids[i].velocity.x = vx;
         asteroids[i].velocity.y = vy;
-        asteroids[i].obj_vert[0].x = .0;
-        asteroids[i].obj_vert[0].y = .4;
-        asteroids[i].obj_vert[1].x = .2;
-        asteroids[i].obj_vert[1].y = .3;
-        asteroids[i].obj_vert[2].x = .2;
-        asteroids[i].obj_vert[2].y = .1;
-        asteroids[i].obj_vert[3].x = .4;
-        asteroids[i].obj_vert[3].y = .0;
-        asteroids[i].obj_vert[4].x = .3;
-        asteroids[i].obj_vert[4].y = -.2;
-        asteroids[i].obj_vert[5].x = .1;
-        asteroids[i].obj_vert[5].y = -.2;
-        asteroids[i].obj_vert[6].x = .0;
-        asteroids[i].obj_vert[6].y = -.3;
-        asteroids[i].obj_vert[7].x = -.2;
-        asteroids[i].obj_vert[7].y = -.2;
-        asteroids[i].obj_vert[8].x = -.4;
-        asteroids[i].obj_vert[8].y = 0;
-        asteroids[i].obj_vert[9].x = -.3;
-        asteroids[i].obj_vert[9].y = .3;
+        init_asteroids_verts(&(asteroids[i]));
 
         for (j = 0; j < VERTS; j++) {
-
             //coverts verts from obj space to world space and traslate world space to screen space
             multiply_vector(&asteroids[i].obj_vert[j], 20);
             add_vector(&asteroids[i].world_vert[j], &asteroids[i].obj_vert[j]);
@@ -113,14 +117,11 @@ void update_asteroids(struct asteroid asteroids[], int size) {
     }
 }
 
-void draw_asteroids(struct asteroid asteroids[], int size) {
-
+void draw_asteroids(struct asteroid asteroids[], int size)
+{
     int i = 0;
-
     for (i = 0; i < size; i++) {
-
         if (asteroids[i].alive) {
-
             draw_line(asteroids[i].world_vert[0].x, asteroids[i].world_vert[0].y, asteroids[i].world_vert[1].x, asteroids[i].world_vert[1].y, 1);
             draw_line(asteroids[i].world_vert[1].x, asteroids[i].world_vert[1].y, asteroids[i].world_vert[2].x, asteroids[i].world_vert[2].y, 1);
             draw_line(asteroids[i].world_vert[2].x, asteroids[i].world_vert[2].y, asteroids[i].world_vert[3].x, asteroids[i].world_vert[3].y, 1);
@@ -131,88 +132,44 @@ void draw_asteroids(struct asteroid asteroids[], int size) {
             draw_line(asteroids[i].world_vert[7].x, asteroids[i].world_vert[7].y, asteroids[i].world_vert[8].x, asteroids[i].world_vert[8].y, 1);
             draw_line(asteroids[i].world_vert[8].x, asteroids[i].world_vert[8].y, asteroids[i].world_vert[9].x, asteroids[i].world_vert[9].y, 1);
             draw_line(asteroids[i].world_vert[9].x, asteroids[i].world_vert[9].y, asteroids[i].world_vert[0].x, asteroids[i].world_vert[0].y, 1);
-
-        float hr = asteroids[i].hit_radius;
-        struct vector2d
-            loc = asteroids[i].location,
-            translation = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
-        add_vector(&loc, &translation);
-
-        draw_line(loc.x-hr, loc.y-hr, loc.x+hr, loc.y-hr, 1);
-        draw_line(loc.x+hr, loc.y-hr, loc.x+hr, loc.y+hr, 1);
-        draw_line(loc.x+hr, loc.y+hr, loc.x-hr, loc.y+hr, 1);
-        draw_line(loc.x-hr, loc.y+hr, loc.x-hr, loc.y-hr, 1);
         }
     }
 }
 
-int shrink_asteroid(struct asteroid* a, int size) {
-
-    a->obj_vert[0].x = .0;
-    a->obj_vert[0].y = .4;
-    a->obj_vert[1].x = .2;
-    a->obj_vert[1].y = .3;
-    a->obj_vert[2].x = .2;
-    a->obj_vert[2].y = .1;
-    a->obj_vert[3].x = .4;
-    a->obj_vert[3].y = .0;
-    a->obj_vert[4].x = .3;
-    a->obj_vert[4].y = -.2;
-    a->obj_vert[5].x = .1;
-    a->obj_vert[5].y = -.2;
-    a->obj_vert[6].x = .0;
-    a->obj_vert[6].y = -.3;
-    a->obj_vert[7].x = -.2;
-    a->obj_vert[7].y = -.2;
-    a->obj_vert[8].x = -.4;
-    a->obj_vert[8].y = 0;
-    a->obj_vert[9].x = -.3;
-    a->obj_vert[9].y = .3;
-
+int shrink_asteroid(struct asteroid* a, int size)
+{
+    init_asteroids_verts(a);
     int i = 0;
 
     for (i = 0; i < VERTS; i++) {
-
         multiply_vector(&a->obj_vert[i], 20);
     }
 
     if (size == LARGE) {
-
         //shrink asteroid
         for (i = 0; i < VERTS; i++) {
-
             divide_vector(&a->obj_vert[i], 2);
         }
-
         a->size = MEDIUM;
-
         return 0;
     }
 
     if (size == MEDIUM) {
-
         //shrink asteroid
         for (i = 0; i < VERTS; i++) {
-
             divide_vector(&a->obj_vert[i], 4);
         }
-
         a->size = SMALL;
-
         return 0;
     }
 
     if (size == SMALL) {
-
         //shrink asteroid
         for (i = 0; i < VERTS; i++) {
-
             divide_vector(&a->obj_vert[i], 8);
         }
-
         return 0;
     }
-
     return 1;
 }
 
