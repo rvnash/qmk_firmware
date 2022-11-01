@@ -3,7 +3,7 @@
 
 #include "vector.h"
 
-#define P_VERTS 3
+#define P_VERTS 6
 #define BULLETS 3
 
 struct bullet {
@@ -28,7 +28,7 @@ struct player {
 
 void init_player(struct player* p);
 
-void draw_player(struct player* p);
+void draw_player(struct player* p, bool thrust);
 
 void shoot_bullet(struct player* p);
 

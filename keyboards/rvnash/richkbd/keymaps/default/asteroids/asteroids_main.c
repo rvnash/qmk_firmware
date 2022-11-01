@@ -4,6 +4,7 @@
 #include "asteroids.h"
 
 #define ASTEROIDS 27
+#define START_ASTROIDS 3
 #define LIVES 3
 
 struct asteroid asteroids[ASTEROIDS];   //The asteroids
@@ -15,7 +16,8 @@ static uint32_t asteroid_timer;
 int loop_count = 0;
 uint32_t loop_timer;
 int score;
-bool game_over=false;
+int game_round;
+bool game_over;
 
 void asteroids_init(void)
 {
@@ -41,8 +43,10 @@ void asteroids_init(void)
     }
     //set up player and asteroids in world space
     init_player(&p);
-    init_asteroids(asteroids, ASTEROIDS);
     score = 0;
+    game_round = 0;
+    init_asteroids(asteroids, ASTEROIDS, START_ASTROIDS+game_round);
+    game_over = false;
     next_loop = MS_PER_FRAME;
     asteroid_timer = timer_read32();
     loop_timer = timer_read32();
@@ -53,16 +57,16 @@ bool key_right = false;
 bool key_up = false;
 void asteroids_process_record_quantum(keyrecord_t *record)
 {
-    if (record->event.key.col == 8 && record->event.key.row == 1) {
+    if (record->event.key.col == 8) {
         key_left = record->event.pressed;
     }
-    if (record->event.key.col == 9 && record->event.key.row == 1) {
+    if (record->event.key.col == 9) {
         key_right = record->event.pressed;
     }
-    if (record->event.key.col == 10 && record->event.key.row == 1) {
+    if (record->event.key.col == 10 ) {
         key_up = record->event.pressed;
     }
-    if (record->event.key.col == 7 && record->event.key.row == 1 && record->event.pressed && p.lives && p.alive) {
+    if (record->event.key.col == 7 && record->event.pressed && p.lives && p.alive) {
         shoot_bullet(&p);
     }
 }
@@ -80,14 +84,21 @@ void asteroids_loop(void)
     oled_clear();
     if (game_over) {
         char tmp[6];
-        snprintf(tmp, sizeof(tmp), "%-5d", score);
         oled_set_cursor(6, 2);
         oled_write("GAME OVER", false);
         oled_set_cursor(6, 3);
-        oled_write("SCORE:", false);
-        oled_set_cursor(13, 3);
+        oled_write("SCORE: ", false);
+        snprintf(tmp, sizeof(tmp), "%-d", score);
+        oled_write(tmp, false);
+        oled_set_cursor(6, 4);
+        oled_write("ROUNDS: ", false);
+        snprintf(tmp, sizeof(tmp), "%-d", game_round);
         oled_write(tmp, false);
         return;
+    }
+    if (asteroids_alive == 0) {
+        game_round++;
+        init_asteroids(asteroids, ASTEROIDS, START_ASTROIDS+game_round);
     }
     if (timer_elapsed32(loop_timer) >= 1000) {
         uprintf("astr loop cnt %d\n", loop_count);
@@ -110,10 +121,10 @@ void asteroids_loop(void)
     }
     // draw to the pixel buffer
     draw_score();
-    draw_player( &p);
-    draw_player( &lives[0]);
-    draw_player( &lives[1]);
-    draw_player( &lives[2]);
+    draw_player( &p, key_up);
+    draw_player( &lives[0], false);
+    draw_player( &lives[1], false);
+    draw_player( &lives[2], false);
     draw_asteroids(asteroids, ASTEROIDS);
     update_player(&p);
     bounds_player(&p);
@@ -143,10 +154,8 @@ void asteroids_loop(void)
             p.exploding_time = 0;
         }
     }
-
-    int i = 0;
     struct vector2d translation = {-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2};
-    for (i = 0; i < BULLETS; i++) {
+    for (int i = 0; i < BULLETS; i++) {
         //only check for collision for bullets that are shown on screen
         if (p.bullets[i].alive) {
             //convert bullet screen space location to world space to compare
@@ -166,17 +175,12 @@ void asteroids_loop(void)
                         score += 1;
                     break;
                 }
-                asteroids[index].alive = 0;
                 p.bullets[i].alive = false;
-                if (asteroids[index].size != SMALL) {
-                    spawn_asteroids(asteroids, ASTEROIDS, asteroids[index].size, asteroids[index].location);
-                }
+                hit_asteroids(asteroids, ASTEROIDS, index);
             }
         }
     }
-
     update_asteroids(asteroids, ASTEROIDS);
-
 }
 
 void asteroids_pump(void)

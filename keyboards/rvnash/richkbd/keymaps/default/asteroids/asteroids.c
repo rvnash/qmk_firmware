@@ -7,6 +7,8 @@
 #include "renderer.h"
 #include "asteroids.h"
 
+int asteroids_alive;
+
 void init_asteroids_verts(struct asteroid* a)
 {
     a->obj_vert[0].x = .0;
@@ -31,52 +33,36 @@ void init_asteroids_verts(struct asteroid* a)
     a->obj_vert[9].y = .3;
 }
 
-void init_asteroids(struct asteroid asteroids[], int size) {
-
-    int i = 0;
-    int j = 0;
+void init_asteroids(struct asteroid asteroids[], int size, int count)
+{
     struct vector2d translation = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
-
-    for (i = 0; i < size; i++) {
-
+    for (int i = 0; i < size; i++) {
         int sign_x = rand() % 100;
         int sign_y = rand() % 100;
-
         //start asteroid in random location
         int lx = rand() % SCREEN_WIDTH / 2;
         int ly = rand() % SCREEN_HEIGHT / 2;
-
         //give asteroid random velocity
-        float vx = (float) (rand() % 500) / 1000;
-        float vy = (float) (rand() % 500) / 1000;
-
+        float vx = (float) (rand() % 500) / 1000 + 0.1;
+        float vy = (float) (rand() % 500) / 1000 + 0.1;
         float degrees =  (float) (rand() %  100 + 1000) / 1000;
-
         //50% chance the sign of the variable will be switched to negative
         if (sign_x >= 50) {
-
             vx = -vx;
             lx = -lx;
             degrees = -degrees;
         }
-
         //50% chance the sign of the variable will be switched to negative
         if (sign_y >= 50) {
-
             vy = -vy;
             ly = -ly;
         }
-
-        //firest 3 asteroids are alive
-        if (i <  3) {
-
+        // first count asteroids are alive
+        if (i < count) {
             asteroids[i].alive = 1;
-
         } else {
-
             asteroids[i].alive = 0;
         }
-
         asteroids[i].size = LARGE;
         asteroids[i].hit_radius = 8;
         asteroids[i].rotation = degrees;
@@ -85,24 +71,24 @@ void init_asteroids(struct asteroid asteroids[], int size) {
         asteroids[i].velocity.x = vx;
         asteroids[i].velocity.y = vy;
         init_asteroids_verts(&(asteroids[i]));
-
-        for (j = 0; j < VERTS; j++) {
+        for (int j = 0; j < VERTS; j++) {
             //coverts verts from obj space to world space and traslate world space to screen space
             multiply_vector(&asteroids[i].obj_vert[j], 20);
             add_vector(&asteroids[i].world_vert[j], &asteroids[i].obj_vert[j]);
             add_vector(&asteroids[i].world_vert[j], &translation);
         }
     }
+    asteroids_alive = count;
 }
 
-void update_asteroids(struct asteroid asteroids[], int size) {
+void update_asteroids(struct asteroid asteroids[], int size)
+{
 
     int i = 0;
     int j = 0;
     struct vector2d translation = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
 
     for (i = 0; i < size; i++) {
-
         //updates each asteroids location based off its velicity vector
         add_vector(&asteroids[i].location, &asteroids[i].velocity);
 
@@ -136,11 +122,10 @@ void draw_asteroids(struct asteroid asteroids[], int size)
     }
 }
 
-int shrink_asteroid(struct asteroid* a, int size)
+int set_size_asteroids(struct asteroid* a, int size)
 {
     init_asteroids_verts(a);
     int i = 0;
-
     for (i = 0; i < VERTS; i++) {
         multiply_vector(&a->obj_vert[i], 20);
     }
@@ -173,80 +158,75 @@ int shrink_asteroid(struct asteroid* a, int size)
     return 1;
 }
 
-void spawn_asteroids(struct asteroid a[], int length, int size, struct vector2d v) {
-
-    int i = 0;
+void spawn_asteroids(struct asteroid a[], int length, int size, struct vector2d v)
+{
     int count = 0;
 
-    for (i = 0; i < length; i++) {
-
+    for (int i = 0; i < length; i++) {
         if(a[i].alive == 0) {
-
             if (count == 3) {
-
                 break;
             }
-
+            asteroids_alive++;
             a[i].location = v;
+            //give asteroid random velocity
+            a[i].velocity.x = (float) (rand() % 500) / 1000 + 0.1;
+            a[i].velocity.y = (float) (rand() % 500) / 1000 + 0.1;
+            //50% chance the sign of the variable will be switched to negative
+            if (rand() % 100 >= 50) a[i].velocity.x = -a[i].velocity.x;
+            //50% chance the sign of the variable will be switched to negative
+            if (rand() % 100 >= 50) a[i].velocity.y = -a[i].velocity.y;
             a[i].hit_radius /= 2;
             a[i].alive = 1;
             count++;
-            shrink_asteroid(&a[i], size);
+            set_size_asteroids(&a[i], size);
         }
     }
 }
 
-void bounds_asteroids(struct asteroid asteroids[], int size) {
+void hit_asteroids(struct asteroid asteroids[], int size, int index)
+{
+    asteroids[index].alive = 0;
+    asteroids_alive--;
+    if (asteroids[index].size != SMALL) {
+        spawn_asteroids(asteroids, size, asteroids[index].size, asteroids[index].location);
+    }
+}
 
+void bounds_asteroids(struct asteroid asteroids[], int size)
+{
     int i = 0;
-
     for (i = 0 ; i < size; i++) {
-
         if (asteroids[i].location.x < -SCREEN_WIDTH / 2) {
-
             asteroids[i].location.x = SCREEN_WIDTH / 2;
         }
-
         if (asteroids[i].location.x > SCREEN_WIDTH / 2) {
-
             asteroids[i].location.x = -SCREEN_WIDTH / 2;
         }
-
         if (asteroids[i].location.y < -SCREEN_HEIGHT / 2) {
-
             asteroids[i].location.y = SCREEN_HEIGHT / 2;
         }
-
         if (asteroids[i].location.y > SCREEN_HEIGHT / 2) {
-
             asteroids[i].location.y = -SCREEN_HEIGHT / 2;
         }
     }
 }
 
 
-int collision_asteroids(struct asteroid asteroids[], int size, struct vector2d* v, float radius) {
-
-
+int collision_asteroids(struct asteroid asteroids[], int size, struct vector2d* v, float radius)
+{
     int i = 0;
-
-
     for (i = 0; i < size; i++) {
-
         //only check for collions for asteroids that are shown onscreen
         if (asteroids[i].alive == 1) {
-
             float sum = asteroids[i].hit_radius + radius;
             float a = pow(asteroids[i].location.x - v->x, 2);
             float b = pow(asteroids[i].location.y - v->y, 2);
             float distance = sqrt(a + b);
-
             if (distance < sum) {
-
                 return i;
             }
         }
     }
-
     return -1;
 }

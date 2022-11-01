@@ -20,6 +20,12 @@ void init_player_verts(struct player* p)
     p->obj_vert[1].y = -1;
     p->obj_vert[2].x = 1;
     p->obj_vert[2].y = -1;
+    p->obj_vert[3].x = 0.75;
+    p->obj_vert[3].y = -1;
+    p->obj_vert[4].x = 0;
+    p->obj_vert[4].y = -2.0;
+    p->obj_vert[5].x = -0.75;
+    p->obj_vert[5].y = -1;
     struct vector2d translation = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
     for(int i = 0; i < P_VERTS; i++) {
         multiply_vector(&p->obj_vert[i], -1);
@@ -92,18 +98,38 @@ void draw_player_line(struct player* p, int x1, int y1,int x2, int y2, int n)
                 x2 -= elapsed;
                 y2 += elapsed;
                 break;
+            case 3:
+                x1 += elapsed;
+                y1 -= elapsed;
+                x2 += elapsed;
+                y2 -= elapsed;
+                break;
+            case 4:
+                x1 -= elapsed/2;
+                y1 += elapsed/2;
+                x2 -= elapsed/2;
+                y2 += elapsed/2;
+                break;
         }
     }
     draw_line(x1, y1, x2, y2, 1);
 }
 
-void draw_player(struct player* p)
+bool flicker_last = false;
+void draw_player(struct player* p, bool thrust)
 {
     int i = 0;
     if (p->exploding_time != 0 || (p->alive && p->lives > 0)) {
         draw_player_line(p, p->world_vert[0].x, p->world_vert[0].y, p->world_vert[1].x, p->world_vert[1].y, 0);
         draw_player_line(p, p->world_vert[1].x, p->world_vert[1].y, p->world_vert[2].x, p->world_vert[2].y, 1);
         draw_player_line(p, p->world_vert[2].x, p->world_vert[2].y, p->world_vert[0].x, p->world_vert[0].y, 2);
+        if (thrust && !p->exploding_time) {
+            if (flicker_last) {
+                draw_player_line(p, p->world_vert[3].x, p->world_vert[3].y, p->world_vert[4].x, p->world_vert[4].y, 3);
+                draw_player_line(p, p->world_vert[4].x, p->world_vert[4].y, p->world_vert[5].x, p->world_vert[5].y, 4);
+            }
+            flicker_last = !flicker_last;
+        }
     }
     //draw verts representing the bullets
     for (i = 0; i < BULLETS; i++) {

@@ -17,10 +17,13 @@ struct asteroid {
 	struct vector2d world_vert[VERTS];
 };
 
-void init_asteroids(struct asteroid asteroids[], int size);
+extern int asteroids_alive;
+
+void init_asteroids(struct asteroid asteroids[], int size, int count);
 void update_asteroids(struct asteroid asteroids[], int size);
 void draw_asteroids(struct asteroid asteroids[], int size);
-int shrink_asteroid(struct asteroid* a, int size);
+int set_size_asteroids(struct asteroid* a, int size);
 void spawn_asteroids(struct asteroid a[], int length, int size, struct vector2d v);
 void bounds_asteroids(struct asteroid asteroids[], int size);
 int collision_asteroids(struct asteroid asteroids[], int size, struct vector2d* v, float radius);
+void hit_asteroids(struct asteroid asteroids[], int size, int index);
