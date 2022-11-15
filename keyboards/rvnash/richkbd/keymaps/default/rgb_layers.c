@@ -85,6 +85,7 @@ void rgb_matrix_indicators_kb()
                 {6,2, 6,2,     RGB_BLUE}, // ins
                 {7,2, 10,2,    RGB_BLUE}, // home, pg down, pg up, end
                 {1,1, 4,1,     RGB_YELLOW}, // homerow mods active on the left
+                {4,3, 4,3,     RGB_GREEN}, // Activation key
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );
@@ -98,6 +99,7 @@ void rgb_matrix_indicators_kb()
                 {7,2, 10,2,    RGB_BLUE}, // Wheel left, down, up, right
                 {6,3, 8,3,     RGB_CHARTREUSE}, // left, middle, right mouse button
                 {1,1, 4,1,     RGB_YELLOW}, // homerow mods active on the left
+                {5,3, 5,3,     RGB_GREEN}, // Activation key
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );
@@ -113,6 +115,7 @@ void rgb_matrix_indicators_kb()
                 {4,1, 4,1,     RGB_YELLOW}, // Shift mod available
                 {6,3, 8,3,     RGB_RED},    // mute, vol-, vol+
                 {10,1, 10,2,   RGB_CHARTREUSE},    // Laptop display bright+, bright-
+                {3,3, 3,3,     RGB_GREEN}, // Activation key
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );
@@ -128,6 +131,9 @@ void rgb_matrix_indicators_kb()
                 {5,0, 5,2,     RGB_BLUE},  // Symbols on the right of nums
                 {4,3, 5,3,     RGB_BLUE},  // Symbols on thumb row
                 {7,1, 10,1,     RGB_YELLOW}, // homerow mods active on the right
+                {0,2, 0,2,     RGB_CHARTREUSE}, // Left tab
+                {11,2, 11,2,     RGB_CHARTREUSE}, // Right tab
+                {7,3, 7,3,     RGB_GREEN}, // Activation key
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );
@@ -138,6 +144,9 @@ void rgb_matrix_indicators_kb()
             range_color rc[] = {
                 {0,0, 11,3,    RGB_BLACK}, // Black out the whole keyboard
                 {1,0, 5,3,     RGB_BLUE}, // All of the keys on the left side are symbols´
+                {0,2, 0,2,     RGB_CHARTREUSE}, // Browser Back
+                {11,2, 11,2,     RGB_CHARTREUSE}, // Browser Forward
+                {6,3, 6,3,     RGB_GREEN}, // Activation key
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );
@@ -149,6 +158,7 @@ void rgb_matrix_indicators_kb()
                 {0,0, 11,3,    RGB_BLACK}, // Black out the whole keyboard
                 {2,0, 4,2,     RGB_GREEN}, // F1-F9
                 {1,0, 1,2,     RGB_CHARTREUSE},    // F10-F12
+                {8,3, 8,3,     RGB_GREEN}, // Activation key
                 {-1,-1, -1,-1, -1,-1,-1}
                 };
             set_colors_by_ranges( rc );
