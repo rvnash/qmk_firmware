@@ -37,13 +37,13 @@ enum keyboard_keycodes {
 // of the duplicate ways at getting at things are removed.
 // ---------------------------------------------------------------------
 #define COLEMAK_LAYER \
-LCTL(LSFT(LGUI(KC_4))), KC_Q, KC_W, KC_F, KC_P, KC_B, KC_J, KC_L, KC_U, KC_Y, KC_QUOT, LSFT(LGUI(KC_A)), \
+LSFT(LGUI(KC_4)), KC_Q, KC_W, KC_F, KC_P, KC_B, KC_J, KC_L, KC_U, KC_Y, KC_QUOT, LSFT(LGUI(KC_A)), \
 KC_LCTL, LCTL_T(KC_A), LALT_T(KC_R), LGUI_T(KC_S), LSFT_T(KC_T), KC_G, KC_M, RSFT_T(KC_N), RGUI_T(KC_E), RALT_T(KC_I), RCTL_T(KC_O), LSFT(LGUI(KC_V)), \
 LCTL(KC_LEFT), KC_Z, KC_X, KC_C, KC_D, KC_V, KC_K, KC_H, KC_COMM, KC_DOT, KC_SLSH, LCTL(KC_RIGHT), \
 LT(MEDIA, KC_ESC), LT(NAV, KC_SPC), LT(MOUSE, KC_TAB), LT(SYM, KC_ENT), LT(NUM, KC_BSPC), LT(FUN, KC_DEL)
 
 #define QWERTY_LAYER \
-LCTL(LSFT(LGUI(KC_4))), KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, LSFT(LGUI(KC_A)), \
+LSFT(LGUI(KC_4)), KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, LSFT(LGUI(KC_A)), \
 KC_LCTL, LCTL_T(KC_A), LALT_T(KC_S), LGUI_T(KC_D), LSFT_T(KC_F), KC_G, KC_H, RSFT_T(KC_J), RGUI_T(KC_K), RALT_T(KC_L), RCTL_T(KC_QUOT), LSFT(LGUI(KC_V)), \
 LCTL(KC_LEFT), KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, LCTL(KC_RIGHT), \
 LT(MEDIA, KC_ESC), LT(NAV, KC_SPC), LT(MOUSE, KC_TAB), LT(SYM, KC_ENT), LT(NUM, KC_BSPC), LT(FUN, KC_DEL)
