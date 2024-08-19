@@ -37,6 +37,7 @@
 
 // CAPS WORD settings
 #define BOTH_SHIFTS_TURNS_ON_CAPS_WORD
+#define DOUBLE_TAP_SHIFT_TURNS_ON_CAPS_WORD
 #define CAPS_WORD_IDLE_TIMEOUT 5000
 
 // Mouse key speed and acceleration.
